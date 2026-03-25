@@ -124,7 +124,6 @@
         const bw = bodyWeight || 57;
         const age = userAge || 52;
         
-        // 年齡越大越保守（50歲以上明顯降低）
         let ageFactor = 1.0;
         if (age >= 55) ageFactor = 0.78;
         else if (age >= 50) ageFactor = 0.85;
@@ -137,4 +136,150 @@
         if (text.includes("硬舉") || text.includes("rdl")) return `${Math.round(bw * 0.65 * ageFactor)}~${Math.round(bw * 0.95 * ageFactor)} kg`;
         if (text.includes("臥推")) return `${Math.round(bw * 0.35 * ageFactor)}~${Math.round(bw * 0.6 * ageFactor)} kg`;
         if (text.includes("肩推")) return `${Math.round(bw * 0.3 * ageFactor)}~${Math.round(bw * 0.5 * ageFactor)} kg`;
-        if (text.includes("下拉") || text.includes("划船")) return `${Math.round(bw * 0.45 * ageFactor)}~${Math.round(bw * 0.7 * ageFactor)} kg
+        if (text.includes("下拉") || text.includes("划船")) return `${Math.round(bw * 0.45 * ageFactor)}~${Math.round(bw * 0.7 * ageFactor)} kg`;
+        if (text.includes("引體向上")) return "體重輔助或彈力帶";
+        if (text.includes("二頭") || text.includes("三頭") || text.includes("腿彎舉")) return `${Math.round(bw * 0.2 * ageFactor)}~${Math.round(bw * 0.35 * ageFactor)} kg`;
+        
+        return "依個人能力調整";
+    }
+
+    function saveRecord(key) {
+        const val = document.getElementById(`input_${key}`).value.trim();
+        if (val) {
+            localStorage.setItem(key, val);
+            alert("成績已儲存！");
+            generatePlan(true);
+        }
+    }
+
+    function addStat() {
+        const date = document.getElementById('stat-date').value;
+        const weight = parseFloat(document.getElementById('stat-weight').value);
+        const waist = parseFloat(document.getElementById('stat-waist').value) || 0;
+        if (!date || !weight) return alert("請填寫日期與體重");
+
+        let stats = JSON.parse(localStorage.getItem('EnPassiveStats') || '[]');
+        stats.push({ date, weight, waist });
+        stats.sort((a,b) => new Date(a.date) - new Date(b.date));
+        localStorage.setItem('EnPassiveStats', JSON.stringify(stats));
+        updateChart();
+    }
+
+    function updateChart() {
+        const stats = JSON.parse(localStorage.getItem('EnPassiveStats') || '[]');
+        if (stats.length === 0) return;
+        if (myChart) myChart.destroy();
+        myChart = new Chart(document.getElementById('growthChart'), {
+            type: 'line',
+            data: {
+                labels: stats.map(s => s.date),
+                datasets: [
+                    { label: '體重(kg)', data: stats.map(s => s.weight), borderColor: '#2563eb', tension: 0.2, yAxisID: 'y' },
+                    { label: '腰圍(cm)', data: stats.map(s => s.waist), borderColor: '#ea580c', tension: 0.2, yAxisID: 'y1' }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { 
+                y: { position: 'left', title: { display: true, text: 'kg' } },
+                y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'cm' } }
+            }}
+        });
+    }
+
+    function calculateProgression(lastVal) {
+        const match = lastVal.match(/(\d+\.?\d*)\s*[kK]?[gG]?\s*[\*xX\s]\s*(\d+)/);
+        if (match) {
+            const w = parseFloat(match[1]);
+            const r = parseInt(match[2]);
+            return `💡 下週建議：${w + 1.25}~${w + 2.5}kg × ${r} 或 ${w}kg × ${r + 1}~2 次`;
+        }
+        return `💡 建議：增加重量 1.25~2.5kg 或多做 1-2 次`;
+    }
+
+    function renderSection(title, data) {
+        let html = `<strong>📍 ${title} (擇一)：</strong><div style="margin-top:8px;">`;
+        data.forEach(item => {
+            html += `<div class="meal-option"><strong>✔️ ${item.name}</strong><br><span style="color:var(--muted); font-size:12.5px;">${item.desc}</span></div>`;
+        });
+        return html + `</div>`;
+    }
+
+    function generatePlan(isUpdate = false) {
+        const age = parseFloat(document.getElementById('age').value) || 52;
+        const height = parseFloat(document.getElementById('height').value) || 165;
+        const weight = parseFloat(document.getElementById('weight').value) || 57;
+        const goal = document.getElementById('goal').value;
+        const mode = document.getElementById('workoutMode').value;
+
+        const bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+        const targetCal = goal === 'muscle' ? (bmr * 1.55) + 350 : (bmr * 1.55) - 400;
+        
+        const proteinGrams = Math.min(120, Math.max(110, Math.round(weight * 2.0)));
+        const fatGrams = Math.round((targetCal * 0.28) / 9);
+        const carbsGrams = Math.round((targetCal - (proteinGrams * 4) - (fatGrams * 9)) / 4);
+
+        document.getElementById('t-cal').innerText = Math.round(targetCal);
+        document.getElementById('t-pro').innerText = `${proteinGrams}g`;
+        document.getElementById('t-fat').innerText = `${fatGrams}g`;
+        document.getElementById('t-car').innerText = `${carbsGrams}g`;
+
+        document.getElementById('meal-timing').innerHTML = 
+            renderSection("早餐", dietData.breakfast) + "<br>" +
+            renderSection("午餐", dietData.lunch) + "<br>" +
+            renderSection("晚餐", dietData.dinner) + "<br>" +
+            renderSection("點心 / 訓練後", dietData.snack);
+
+        const wkData = workoutData[mode];
+        if (!wkData || !wkData.schedule) {
+            alert("❌ 訓練資料載入失敗！請確認 data.js 是否正確上傳。");
+            return;
+        }
+
+        document.getElementById('workout-title').innerText = `🏋️‍♂️ ${wkData.name}`;
+        document.getElementById('workout-desc').innerText = wkData.description || '';
+
+        const tbody = document.querySelector('#workout-table tbody');
+        tbody.innerHTML = wkData.schedule.map((day, index) => {
+            const key = `log_${mode}_${index}`;
+            const lastVal = localStorage.getItem(key) || '尚未記錄';
+            
+            let tipHTML = '';
+            if (lastVal !== '尚未記錄' && day.type === '重訓') {
+                tipHTML = `<div class="progression-tip">${calculateProgression(lastVal)}</div>`;
+            }
+
+            const suggested = getSuggestedWeight(day.routine, weight, age);
+
+            const recordHTML = day.type === '重訓' ? `
+                <div class="log-container">
+                    <div class="benchmark">🏆 建議起始重量：${suggested}</div>
+                    <div class="prev-data"><b>上週成績：</b>${lastVal}</div>
+                    ${tipHTML}
+                    <input type="text" id="input_${key}" class="record-input" placeholder="本日成績 (例如: 62.5kg x 8)">
+                    <button onclick="saveRecord('${key}')" class="save-btn">💾 儲存成績</button>
+                </div>` : `<span style="color:#94a3b8;">休息日 / 主動恢復</span>`;
+
+            return `<tr>
+                <td><strong>${day.day}</strong></td>
+                <td><span style="color:#475569; font-weight:600;">${day.focus}</span></td>
+                <td>${day.routine || '動作資料異常'}</td>
+                <td>${recordHTML}</td>
+            </tr>`;
+        }).join('');
+
+        document.getElementById('milestone-text').innerHTML = goal === 'muscle' 
+            ? "⏱️ 【增肌期】力量進步就是肌肉進步！請耐心累積。" 
+            : "⏱️ 【減脂期】每週體重下降約 0.5%，守住力量最重要。";
+
+        document.getElementById('result-section').style.display = 'block';
+        if (!isUpdate) {
+            updateChart();
+            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    window.onload = () => {
+        updateChart();
+    };
+</script>
+</body>
+</html>
