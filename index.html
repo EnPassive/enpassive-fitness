@@ -50,7 +50,7 @@
 
     <div class="grid">
         <div class="form-group"><label>年齡 (歲)</label><input type="number" id="age" value="52"></div>
-        <div class="form-group"><label>身高 (cm)</label><input type="number" id="height" value="164"></div>
+        <div class="form-group"><label>身高 (cm)</label><input type="number" id="height" value="165"></div>
         <div class="form-group"><label>體重 (kg)</label><input type="number" id="weight" value="57" step="0.1"></div>
         <div class="form-group">
             <label>訓練強度評估</label>
@@ -141,14 +141,12 @@
         document.getElementById('t-fat').innerText = `${fatGrams}g`;
         document.getElementById('t-car').innerText = `${carbsGrams}g`;
 
-        // 飲食
         let timingStr = renderMealOptions("早餐", dietData.breakfast) + '<br>' +
                         renderMealOptions("午餐", dietData.lunch) + '<br>' +
                         renderMealOptions("晚餐", dietData.dinner) + '<br>' +
                         renderMealOptions("點心", dietData.snack);
         document.getElementById('meal-timing').innerHTML = timingStr;
 
-        // 訓練 + Gemini 防呆機制
         const wkData = workoutData[mode];
         document.getElementById('workout-title').innerHTML = `🏋️‍♂️ ${wkData.name}`;
         
@@ -156,8 +154,7 @@
         const rowsHtml = wkData.schedule.map(day => {
             let typeColor = day.type === '重訓' ? '#dbeafe' : '#d1fae5';
             let typeTextColor = day.type === '重訓' ? '#1e40af' : '#065f46';
-            let routineContent = day.routine ? day.routine : '<span style="color:red; font-weight:bold;">載入失敗，請確認 data.js 是否正確貼上</span>';
-            
+            let routineContent = day.routine ? day.routine : '<span style="color:red; font-weight:bold;">載入失敗，請確認 data.js</span>';
             return `<tr>
                 <td><strong>${day.day}</strong></td>
                 <td><span style="background:${typeColor}; color:${typeTextColor}; padding:4px 10px; border-radius:6px; font-size:13px; font-weight:bold;">${day.type}</span></td>
@@ -168,7 +165,6 @@
         
         tbody.innerHTML = rowsHtml;
 
-        // 里程碑
         document.getElementById('milestone-text').innerHTML = goal === 'muscle' 
             ? "⏱️ 【務實增肌心法】半年增加 1-2kg 純肌肉已是極限，請專注力量進步與鏡子裡的變化！" 
             : "⏱️ 【減脂期預期】每週體重下降約 0.5%，力量不掉就是成功！";
