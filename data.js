@@ -75,3 +75,56 @@ const dietData = {
         }
     ]
 };
+
+// ==========================================
+// 訓練資料庫 (Workout Database) - 4 天分化 + 影片連結
+// ==========================================
+const workoutData = {
+    "mode_a": {
+        name: "週末重裝＋平日居家 (上下半身 4 天分化) - 52歲安全版",
+        description: "週末健身房大重量，平日在家啞鈴維持。請嚴格執行「3秒下、1秒上」節奏保護關節。",
+        schedule: [
+            { 
+                day: "週六 (健身房)", 
+                type: "重訓", 
+                focus: "下肢大重量", 
+                routine: `1. 槓鈴深蹲 4x8-10 <a href="https://www.youtube.com/watch?v=dO-51htz_eA" target="_blank">🎥教學</a><br>2. 腿舉機 4x10-12 <a href="https://www.youtube.com/watch?v=IZxyjW7cgng" target="_blank">🎥教學</a><br>3. 羅馬尼亞硬舉 4x8-10 <a href="https://www.youtube.com/watch?v=hQgFixeXdZo" target="_blank">🎥教學</a><br>4. 坐姿/俯臥腿彎舉 3x12 <a href="https://www.youtube.com/watch?v=F488k67BTNo" target="_blank">🎥教學</a>` 
+            },
+            { 
+                day: "週日 (健身房)", 
+                type: "重訓", 
+                focus: "上肢大重量", 
+                routine: `1. 槓鈴/機械臥推 4x8-10 <a href="https://www.youtube.com/watch?v=utIPsneUnuY" target="_blank">🎥教學</a><br>2. 滑輪下拉 4x8-12 <a href="https://www.youtube.com/watch?v=AOpi-p0cJkc" target="_blank">🎥教學</a><br>3. 機械划船 4x10 <a href="https://www.youtube.com/watch?v=GZbfZ033f74" target="_blank">🎥教學</a><br>4. 繩索三頭下壓 3x12 <a href="https://www.youtube.com/watch?v=2-LAMcpzODU" target="_blank">🎥教學</a>` 
+            },
+            { 
+                day: "週一", 
+                type: "恢復", 
+                focus: "完全休息", 
+                routine: "補充魚油＋善存。今日目標：深層睡眠 8 小時。" 
+            },
+            { 
+                day: "週二/週三 (居家)", 
+                type: "重訓", 
+                focus: "啞鈴下肢與核心", 
+                routine: `1. 保加利亞單腿蹲 4x10-12/腿 <a href="https://www.youtube.com/watch?v=vLuhN_glFZ8" target="_blank">🎥教學</a><br>2. 啞鈴直腿硬舉 4x12 <a href="https://www.youtube.com/watch?v=hQgFixeXdZo" target="_blank">🎥教學</a><br>3. 啞鈴高腳杯深蹲 3x15 <a href="https://www.youtube.com/watch?v=MeIiIdhgPwg" target="_blank">🎥教學</a><br>4. 平板支撐 3x60秒 <a href="https://www.youtube.com/watch?v=pSHjTRCQxIw" target="_blank">🎥教學</a>` 
+            },
+            { 
+                day: "週四/週五 (居家)", 
+                type: "重訓", 
+                focus: "引體向上與啞鈴上肢", 
+                routine: `1. 輔助引體向上 4x力竭 <a href="https://www.youtube.com/watch?v=ZHllQTJf7eA" target="_blank">🎥教學</a><br>2. 啞鈴地板臥推 4x10-15 <a href="https://www.youtube.com/watch?v=uUGDRwge4F8" target="_blank">🎥教學</a><br>3. 啞鈴肩推 3x10-12 <a href="https://www.youtube.com/watch?v=qEwKCR5JCog" target="_blank">🎥教學</a><br>4. 啞鈴二頭彎舉 3x12 <a href="https://www.youtube.com/watch?v=ykJmrZ5v0Oo" target="_blank">🎥教學</a>` 
+            }
+        ]
+    },
+    "mode_b": {
+        name: "全居家啞鈴模式 (備用方案)",
+        description: "週末沒空去健身房時的居家替代方案。",
+        schedule: [
+            { day: "Day 1", type: "重訓", focus: "上半身推力", routine: `啞鈴地板臥推 4x15 <a href="https://www.youtube.com/watch?v=uUGDRwge4F8" target="_blank">🎥教學</a><br>啞鈴肩推 4x12 <a href="https://www.youtube.com/watch?v=qEwKCR5JCog" target="_blank">🎥教學</a><br>伏地挺身 3x力竭` },
+            { day: "Day 2", type: "重訓", focus: "下肢", routine: `保加利亞單腿蹲 4x12/腿 <a href="https://www.youtube.com/watch?v=vLuhN_glFZ8" target="_blank">🎥教學</a><br>啞鈴羅馬尼亞硬舉 4x12 <a href="https://www.youtube.com/watch?v=hQgFixeXdZo" target="_blank">🎥教學</a>` },
+            { day: "Day 3", type: "恢復", focus: "休息", routine: "活動度伸展" },
+            { day: "Day 4", type: "重訓", focus: "上半身拉力", routine: `引體向上 4x力竭 <a href="https://www.youtube.com/watch?v=ZHllQTJf7eA" target="_blank">🎥教學</a><br>啞鈴單臂划船 4x12/手 <a href="https://www.youtube.com/watch?v=pYcpY20QaE8" target="_blank">🎥教學</a>` },
+            { day: "Day 5", type: "恢復", focus: "心肺", routine: "戶外慢跑或快走 30 分鐘" }
+        ]
+    }
+};
