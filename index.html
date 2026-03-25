@@ -17,9 +17,6 @@
         input, select { padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; background: #f1f5f9; transition: border 0.2s; }
         input:focus, select:focus { outline: none; border-color: var(--primary); background: #fff; }
         
-        .checkbox-group { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: #9a3412; background: #ffedd5; padding: 12px; border-radius: 8px; border: 1px solid #fdba74; }
-        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
-        
         button { background: var(--primary); color: white; border: none; padding: 16px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.3s; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
         button:hover { background: #1d4ed8; transform: translateY(-1px); }
         
@@ -36,6 +33,7 @@
         
         .tracker-box { background: #f0fdf4; border-left: 5px solid var(--secondary); padding: 20px; border-radius: 12px; margin-bottom: 25px; border-right: 1px solid #bbf7d0; border-top: 1px solid #bbf7d0; border-bottom: 1px solid #bbf7d0; }
         .tracker-item { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 16px; font-weight: 600; color: #166534; }
+        .tracker-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
         .tracker-item:last-child { margin-bottom: 0; }
         
         table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
@@ -48,14 +46,16 @@
         .milestone { text-align: center; font-weight: 600; color: #1e40af; background: #eff6ff; padding: 18px; border-radius: 10px; margin-top: 30px; border: 1px dashed #bfdbfe; font-size: 15px; line-height: 1.6; }
         
         .timing-box { margin-top: 20px; font-size: 14.5px; color: #334155; background: white; padding: 18px; border-radius: 10px; border: 1px solid var(--border); line-height: 1.7; }
-        .timing-box strong { color: var(--primary); font-size: 16px; }
+        .meal-option { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #e2e8f0; }
+        .meal-option:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .timing-box strong { color: var(--primary); font-size: 16px; display: inline-block; margin-bottom: 8px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>EnPassive｜熟齡高階體態與飲食計畫系統</h1>
-    <p class="subtitle">整合 50+ 賀爾蒙控制、無乳糖策略與週末混合式重訓的數位教練</p>
+    <p class="subtitle">專屬 52 歲的科學化增肌、無乳糖飲食與週末混合式重訓</p>
 
     <div class="grid">
         <div class="form-group">
@@ -93,17 +93,6 @@
                 <option value="mode_b">全居家啞鈴模式 (備用方案)</option>
             </select>
         </div>
-        <div class="form-group">
-            <label>週末重訓時間</label>
-            <select id="trainTime">
-                <option value="morning" selected>早上 (午餐為黃金修復餐)</option>
-                <option value="evening">晚上 (晚餐為黃金修復餐)</option>
-            </select>
-        </div>
-        <div class="checkbox-group">
-            <input type="checkbox" id="fasting" checked>
-            <label for="fasting" style="margin:0; cursor:pointer;">執行 168 斷食 (穩定胰島素，增肌不養脂)</label>
-        </div>
     </div>
 
     <button onclick="generatePlan()">🚀 啟動我的科學化課表</button>
@@ -112,7 +101,7 @@
         <div class="tracker-box">
             <h3 style="margin-top:0; margin-bottom:15px; color: #047857; font-size: 18px;">✅ 每日紀律打卡 (52歲防護清單)</h3>
             <label class="tracker-item"><input type="checkbox"> 💧 飲水量達標 3.5 公升 (維持肌肉水合與代謝)</label>
-            <label class="tracker-item"><input type="checkbox"> 💊 補充 5g 肌酸 + 魚油 + 維生素 D3 (抗發炎與骨骼健康)</label>
+            <label class="tracker-item"><input type="checkbox"> 💊 補充男性善存與魚油 (維持基礎微量營養與抗發炎)</label>
             <label class="tracker-item"><input type="checkbox"> 🛌 昨晚睡眠達 7-8 小時 (生長激素分泌，最關鍵的修復)</label>
         </div>
 
@@ -125,6 +114,7 @@
                 <div class="macro-box"><div class="macro-val" id="t-fat" style="color:#047857;">0</div><div class="macro-lbl">優質脂肪 (g)</div></div>
                 <div class="macro-box"><div class="macro-val" id="t-car" style="color:#7e22ce;">0</div><div class="macro-lbl">碳水化合物 (g)</div></div>
             </div>
+            
             <div id="meal-timing" class="timing-box"></div>
         </div>
 
@@ -133,7 +123,7 @@
             <p id="workout-desc" style="font-size: 14.5px; color: var(--muted); font-weight: 500;"></p>
             <div style="overflow-x: auto;">
                 <table id="workout-table">
-                    <thead><tr><th style="width: 15%;">天數</th><th style="width: 10%;">類型</th><th style="width: 25%;">當日重點 & 碳水策略</th><th style="width: 50%;">建議動作 (點擊 🎥 觀看 50+ 安全教學)</th></tr></thead>
+                    <thead><tr><th style="width: 15%;">天數</th><th style="width: 10%;">類型</th><th style="width: 20%;">當日重點</th><th style="width: 55%;">建議動作 (點擊 🎥 觀看教學)</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -146,6 +136,18 @@
 <script src="data.js"></script>
 
 <script>
+    function renderMealOptions(title, options) {
+        let html = `<strong>📍 ${title} (請擇一)：</strong><div style="margin-top:5px;">`;
+        options.forEach(opt => {
+            html += `<div class="meal-option">
+                <span style="font-weight:bold; color:#0f172a;">✔️ ${opt.name}</span><br>
+                <span style="color:var(--muted); font-size:13px;">${opt.desc}</span>
+            </div>`;
+        });
+        html += `</div>`;
+        return html;
+    }
+
     function generatePlan() {
         const age = parseFloat(document.getElementById('age').value);
         const weight = parseFloat(document.getElementById('weight').value);
@@ -153,25 +155,21 @@
         const activity = parseFloat(document.getElementById('activity').value);
         const goal = document.getElementById('goal').value;
         const mode = document.getElementById('workoutMode').value;
-        const trainTime = document.getElementById('trainTime').value;
-        const isFasting = document.getElementById('fasting').checked;
 
         // 1. 計算 BMR (Mifflin-St Jeor) & TDEE
         const bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
         const tdee = bmr * activity;
 
-        // 2. 巨量營養素計算 (融入 50+ 科學比例)
+        // 2. 巨量營養素計算
         let targetCal = tdee;
-        
         if(goal === 'muscle') {
-            targetCal = tdee + 350; // 創造安全的乾淨盈餘
+            targetCal = tdee + 350; 
         } else {
-            targetCal = tdee - 400; // 減脂期赤字
+            targetCal = tdee - 400; 
         }
 
-        // 強制鎖定蛋白質在安全且足夠的區間 (約 2.0g/kg)
         const proteinGrams = Math.round(weight * 2.0); 
-        const fatGrams = Math.round((targetCal * 0.28) / 9); // 脂肪拉高到 28%，保護 50+ 賀爾蒙
+        const fatGrams = Math.round((targetCal * 0.28) / 9); 
         const carbsGrams = Math.round((targetCal - (proteinGrams * 4) - (fatGrams * 9)) / 4);
 
         document.getElementById('t-cal').innerText = `${Math.round(targetCal)}`;
@@ -181,20 +179,14 @@
 
         // 3. 飲食策略文字
         let dietStr = `你的基礎代謝 (BMR) 約為 ${Math.round(bmr)} 大卡，維持熱量 (TDEE) 約為 ${Math.round(tdee)} 大卡。已為你設定無乳糖友善的完美宏量比例。`;
-        if (isFasting) dietStr += " 配合 168 斷食，請在進食窗口內吃足熱量，空腹期僅補充黑咖啡或水。";
         document.getElementById('diet-text').innerText = dietStr;
 
-        // 4. 撈取餐單資料
-        const preMeal = dietData.find(d => d.timing === "pre_workout");
-        const postMeal = dietData.find(d => d.timing === "post_workout");
-        const breakFastingMeal = dietData.find(d => d.timing === "fasting_break");
-        const snackMeal = dietData.find(d => d.timing === "snack");
-
-        let timingStr = `<strong>💡 無乳糖營養時機 (${trainTime === 'morning' ? '晨間重訓' : '夜間重訓'})：</strong><br><br>`;
-        timingStr += `📍 <strong>練前能量 (運動前1-2小時)：</strong>${preMeal.name}<br><span style="color:var(--muted); font-size:13px;">${preMeal.description}</span><br><br>`;
-        timingStr += `📍 <strong>黃金修復 (運動後一小時內)：</strong>${postMeal.name}<br><span style="color:var(--muted); font-size:13px;">${postMeal.description}</span><br><br>`;
-        timingStr += `📍 <strong>優質正餐：</strong>${breakFastingMeal.name}<br><span style="color:var(--muted); font-size:13px;">${breakFastingMeal.description}</span><br><br>`;
-        timingStr += `📍 <strong>嘴饞/睡前點心：</strong>${snackMeal.name}<br><span style="color:var(--muted); font-size:13px;">${snackMeal.description}</span>`;
+        // 4. 渲染餐單選項
+        let timingStr = '';
+        timingStr += renderMealOptions("早餐", dietData.breakfast) + '<br>';
+        timingStr += renderMealOptions("午餐 (練後黃金修復)", dietData.lunch) + '<br>';
+        timingStr += renderMealOptions("晚餐", dietData.dinner) + '<br>';
+        timingStr += renderMealOptions("點心 (嘴饞/補充能量)", dietData.snack);
         document.getElementById('meal-timing').innerHTML = timingStr;
 
         // 5. 渲染訓練課表
@@ -219,12 +211,10 @@
         if(goal === 'muscle') {
             document.getElementById('milestone-text').innerHTML = "⏱️ 【務實增肌心法】身為 52 歲且有經驗的訓練者，半年增加 1-2kg 純肌肉已是極限。<br>請專注於「力量進步」與「鏡子裡肩膀/胸膛變寬」，不要被體重計的數字綁架！";
         } else {
-            document.getElementById('milestone-text').innerHTML = "⏱️ 【減脂期預期】請專注於「每週平均體重」下降約 0.5%，避免斷崖式節食引發皮質醇反撲。力量只要不掉，就是成功的減脂！";
+            document.getElementById('milestone-text').innerHTML = "⏱️ 【減脂期預期】請專注於「每週平均體重」下降約 0.5%。力量只要不掉，就是成功的減脂！";
         }
 
         document.getElementById('result-section').style.display = 'block';
-        
-        // 增加一點延遲讓滑動更順暢
         setTimeout(() => {
             document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
