@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EnPassive｜高階體態增肌系統 v3.5</title>
+    <title>EnPassive｜熟齡高階體態增肌系統 v4.3</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --secondary: #10b981; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b; --border: #e2e8f0; --accent: #f59e0b; }
@@ -31,6 +31,7 @@
         .log-container { display: flex; flex-direction: column; gap: 6px; }
         .prev-data { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 8px; border-radius: 6px; border-left: 3px solid #94a3b8; }
         .progression-tip { font-size: 12px; color: #b45309; background: #fffbeb; padding: 8px; border-radius: 6px; border-left: 3px solid #f59e0b; font-weight: 600; }
+        .benchmark { font-size: 12px; color: #166534; background: #dcfce7; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 4px; }
         .record-input { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; background: white; }
         .save-btn { background: var(--secondary); color: white; border: none; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
         
@@ -49,8 +50,8 @@
 <body>
 
 <div class="container">
-    <h1>EnPassive｜高階體態增肌系統 v3.5</h1>
-    <p class="subtitle">整合智慧漸進建議與無乳糖數據導向工具</p>
+    <h1>EnPassive｜熟齡高階體態增肌系統 v4.3</h1>
+    <p class="subtitle">智慧起始重量 + 漸進建議 + 無乳糖飲食導向</p>
 
     <div class="grid">
         <div class="form-group"><label>年齡</label><input type="number" id="age" value="52"></div>
@@ -100,8 +101,9 @@
                         <tr>
                             <th style="width: 12%;">天數</th>
                             <th style="width: 15%;">重點</th>
-                            <th style="width: 40%;">動作 (🎥教學)</th>
-                            <th style="width: 33%;">💪 漸進紀錄與智慧建議</th>
+                            <th style="width: 35%;">動作 (🎥教學)</th>
+                            <th style="width: 20%;">建議起始重量</th>
+                            <th style="width: 18%;">💪 本次紀錄</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -116,6 +118,19 @@
 <script src="data.js"></script>
 <script>
     let myChart = null;
+
+    // 52歲保守版建議起始重量（根據動作類型動態計算）
+    function getSuggestedWeight(actionName, bodyWeight) {
+        const bw = bodyWeight || 57;
+        const ageFactor = 0.88; // 52歲保守係數
+
+        if (actionName.includes("深蹲") || actionName.includes("腿舉")) return `${Math.round(bw * 0.55 * ageFactor)}~${Math.round(bw * 0.85 * ageFactor)} kg`;
+        if (actionName.includes("硬舉") || actionName.includes("RDL")) return `${Math.round(bw * 0.65 * ageFactor)}~${Math.round(bw * 0.95 * ageFactor)} kg`;
+        if (actionName.includes("臥推") || actionName.includes("肩推")) return `${Math.round(bw * 0.35 * ageFactor)}~${Math.round(bw * 0.6 * ageFactor)} kg`;
+        if (actionName.includes("下拉") || actionName.includes("划船")) return `${Math.round(bw * 0.45 * ageFactor)}~${Math.round(bw * 0.7 * ageFactor)} kg`;
+        if (actionName.includes("二頭") || actionName.includes("三頭") || actionName.includes("腿彎舉")) return `${Math.round(bw * 0.2 * ageFactor)}~${Math.round(bw * 0.35 * ageFactor)} kg`;
+        return "依個人能力調整";
+    }
 
     function saveRecord(key) {
         const val = document.getElementById(`input_${key}`).value.trim();
@@ -196,17 +211,16 @@
         document.getElementById('t-fat').innerText = `${fatGrams}g`;
         document.getElementById('t-car').innerText = `${carbsGrams}g`;
 
-        // 飲食渲染（包含點心）
+        // 飲食渲染（完整包含點心）
         document.getElementById('meal-timing').innerHTML = 
             renderSection("早餐", dietData.breakfast) + "<br>" +
             renderSection("午餐", dietData.lunch) + "<br>" +
             renderSection("晚餐", dietData.dinner) + "<br>" +
             renderSection("點心 / 訓練後", dietData.snack);
 
-        // 訓練課表 - 加強防呆
         const wkData = workoutData[mode];
         if (!wkData || !wkData.schedule) {
-            alert("❌ 訓練資料載入失敗！請確認 data.js 是否正確上傳且包含 mode_a / mode_b。");
+            alert("❌ 訓練資料載入失敗！請確認 data.js 是否正確上傳。");
             return;
         }
 
@@ -223,8 +237,12 @@
                 tipHTML = `<div class="progression-tip">${calculateProgression(lastVal)}</div>`;
             }
 
+            // 建議起始重量
+            const suggested = getSuggestedWeight(day.routine, weight);
+
             const recordHTML = day.type === '重訓' ? `
                 <div class="log-container">
+                    <div class="benchmark">🏆 建議起始重量：${suggested}</div>
                     <div class="prev-data"><b>上週成績：</b>${lastVal}</div>
                     ${tipHTML}
                     <input type="text" id="input_${key}" class="record-input" placeholder="本日成績 (例如: 62.5kg x 8)">
@@ -248,6 +266,16 @@
             updateChart();
             document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
         }
+    }
+
+    function getSuggestedWeight(actionName, bodyWeight) {
+        const bw = bodyWeight || 57;
+        if (actionName.includes("深蹲") || actionName.includes("腿舉")) return `${Math.round(bw * 0.55)}~${Math.round(bw * 0.85)} kg`;
+        if (actionName.includes("硬舉") || actionName.includes("RDL")) return `${Math.round(bw * 0.65)}~${Math.round(bw * 0.95)} kg`;
+        if (actionName.includes("臥推") || actionName.includes("肩推")) return `${Math.round(bw * 0.35)}~${Math.round(bw * 0.6)} kg`;
+        if (actionName.includes("下拉") || actionName.includes("划船")) return `${Math.round(bw * 0.45)}~${Math.round(bw * 0.7)} kg`;
+        if (actionName.includes("二頭") || actionName.includes("三頭") || actionName.includes("腿彎舉")) return `${Math.round(bw * 0.2)}~${Math.round(bw * 0.35)} kg`;
+        return "依能力調整";
     }
 
     window.onload = () => {
