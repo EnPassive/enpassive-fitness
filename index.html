@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EnPassive｜熟齡高階體態增肌系統 v3.5</title>
+    <title>EnPassive｜高階體態增肌系統 v3.5</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --primary: #2563eb; --secondary: #10b981; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b; --border: #e2e8f0; --accent: #f59e0b; }
@@ -11,33 +11,39 @@
         .container { max-width: 1000px; margin: 0 auto; background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         h1 { text-align: center; color: var(--primary); margin-bottom: 5px; font-size: 24px; }
         .subtitle { text-align: center; color: var(--muted); margin-bottom: 25px; font-size: 14px; }
+        
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .form-group { display: flex; flex-direction: column; }
         label { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: #334155; }
         input, select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; background: #f1f5f9; }
-        button.main-btn { background: var(--primary); color: white; border: none; padding: 16px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.3s; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
-        button.main-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+        
+        button.main-btn { background: var(--primary); color: white; border: none; padding: 16px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 20px; }
+        button.main-btn:hover { background: #1d4ed8; }
+        
         #result-section { display: none; padding-top: 20px; border-top: 2px solid var(--border); }
         .card { background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); border-left: 5px solid var(--primary); }
         .card h3 { margin-top: 0; color: var(--primary); border-bottom: 1px dashed #cbd5e1; padding-bottom: 10px; font-size: 18px; }
+        
         .macro-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; text-align: center; margin-top: 15px; }
         .macro-box { background: white; padding: 15px 5px; border-radius: 10px; border: 1px solid var(--border); }
         .macro-val { font-size: 22px; font-weight: 800; }
+        
         .log-container { display: flex; flex-direction: column; gap: 6px; }
         .prev-data { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 8px; border-radius: 6px; border-left: 3px solid #94a3b8; }
         .progression-tip { font-size: 12px; color: #b45309; background: #fffbeb; padding: 8px; border-radius: 6px; border-left: 3px solid #f59e0b; font-weight: 600; }
         .record-input { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; background: white; }
         .save-btn { background: var(--secondary); color: white; border: none; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        
         .chart-container { position: relative; height: 320px; margin-top: 15px; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: top; }
         th { background: #e2e8f0; color: #334155; }
         td a { color: #ea580c; text-decoration: none; font-weight: bold; background: #fff7ed; padding: 2px 4px; border-radius: 4px; }
+        
         .milestone { text-align: center; font-weight: 600; color: #1e40af; background: #eff6ff; padding: 18px; border-radius: 10px; margin-top: 20px; border: 1px dashed #bfdbfe; font-size: 14px; }
         .timing-box { margin-top: 15px; font-size: 14px; color: #334155; background: white; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
         .meal-option { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #e2e8f0; }
         .meal-option:last-child { border-bottom: none; }
-        .meal-option strong { color: #1e293b; }
     </style>
 </head>
 <body>
@@ -115,18 +121,19 @@
         const val = document.getElementById(`input_${key}`).value.trim();
         if (val) {
             localStorage.setItem(key, val);
-            alert("成績已儲存！智慧建議已為下週備妥。");
-            generatePlan(true); // 平滑更新
+            alert("成績已儲存！");
+            generatePlan(true);
         }
     }
 
     function addStat() {
         const date = document.getElementById('stat-date').value;
-        const weight = document.getElementById('stat-weight').value;
-        const waist = document.getElementById('stat-waist').value;
-        if(!date || !weight) return alert("請填寫日期與體重");
+        const weight = parseFloat(document.getElementById('stat-weight').value);
+        const waist = parseFloat(document.getElementById('stat-waist').value) || 0;
+        if (!date || !weight) return alert("請填寫日期與體重");
+
         let stats = JSON.parse(localStorage.getItem('EnPassiveStats') || '[]');
-        stats.push({ date, weight: parseFloat(weight), waist: parseFloat(waist || 0) });
+        stats.push({ date, weight, waist });
         stats.sort((a,b) => new Date(a.date) - new Date(b.date));
         localStorage.setItem('EnPassiveStats', JSON.stringify(stats));
         updateChart();
@@ -146,21 +153,20 @@
                 ]
             },
             options: { responsive: true, maintainAspectRatio: false, scales: { 
-                y: { type: 'linear', position: 'left', title: { display: true, text: 'kg' } },
-                y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'cm' } }
+                y: { position: 'left', title: { display: true, text: 'kg' } },
+                y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'cm' } }
             }}
         });
     }
 
     function calculateProgression(lastVal) {
-        // 智慧解析正則表達式：支援 60kg x 8, 60 * 8, 60 8 等多種輸入
         const match = lastVal.match(/(\d+\.?\d*)\s*[kK]?[gG]?\s*[\*xX\s]\s*(\d+)/);
         if (match) {
             const w = parseFloat(match[1]);
             const r = parseInt(match[2]);
-            return `💡 下週目標：挑戰 <b>${w + 1.25}~${w + 2.5}kg × ${r}</b> 或 <b>${w}kg × ${r + 1}~2</b> 次`;
+            return `💡 下週建議：${w + 1.25}~${w + 2.5}kg × ${r} 或 ${w}kg × ${r + 1}~2 次`;
         }
-        return `💡 建議：嘗試增加重量 1.25~2.5kg 或多做 1-2 次`;
+        return `💡 建議：增加重量 1.25~2.5kg 或多做 1-2 次`;
     }
 
     function renderSection(title, data) {
@@ -172,9 +178,9 @@
     }
 
     function generatePlan(isUpdate = false) {
-        const age = parseFloat(document.getElementById('age').value);
-        const height = parseFloat(document.getElementById('height').value);
-        const weight = parseFloat(document.getElementById('weight').value);
+        const age = parseFloat(document.getElementById('age').value) || 52;
+        const height = parseFloat(document.getElementById('height').value) || 165;
+        const weight = parseFloat(document.getElementById('weight').value) || 57;
         const goal = document.getElementById('goal').value;
         const mode = document.getElementById('workoutMode').value;
 
@@ -190,14 +196,22 @@
         document.getElementById('t-fat').innerText = `${fatGrams}g`;
         document.getElementById('t-car').innerText = `${carbsGrams}g`;
 
+        // 飲食渲染（包含點心）
         document.getElementById('meal-timing').innerHTML = 
             renderSection("早餐", dietData.breakfast) + "<br>" +
             renderSection("午餐", dietData.lunch) + "<br>" +
-            renderSection("晚餐", dietData.dinner);
+            renderSection("晚餐", dietData.dinner) + "<br>" +
+            renderSection("點心 / 訓練後", dietData.snack);
 
+        // 訓練課表 - 加強防呆
         const wkData = workoutData[mode];
+        if (!wkData || !wkData.schedule) {
+            alert("❌ 訓練資料載入失敗！請確認 data.js 是否正確上傳且包含 mode_a / mode_b。");
+            return;
+        }
+
         document.getElementById('workout-title').innerText = `🏋️‍♂️ ${wkData.name}`;
-        document.getElementById('workout-desc').innerText = wkData.description;
+        document.getElementById('workout-desc').innerText = wkData.description || '';
 
         const tbody = document.querySelector('#workout-table tbody');
         tbody.innerHTML = wkData.schedule.map((day, index) => {
@@ -215,26 +229,30 @@
                     ${tipHTML}
                     <input type="text" id="input_${key}" class="record-input" placeholder="本日成績 (例如: 62.5kg x 8)">
                     <button onclick="saveRecord('${key}')" class="save-btn">💾 儲存成績</button>
-                </div>` : `<span style="color:#94a3b8;">主動恢復 / 休息日</span>`;
+                </div>` : `<span style="color:#94a3b8;">休息日 / 主動恢復</span>`;
 
             return `<tr>
                 <td><strong>${day.day}</strong></td>
                 <td><span style="color:#475569; font-weight:600;">${day.focus}</span></td>
-                <td>${day.routine}</td>
+                <td>${day.routine || '動作資料異常'}</td>
                 <td>${recordHTML}</td>
             </tr>`;
         }).join('');
 
         document.getElementById('milestone-text').innerHTML = goal === 'muscle' 
-            ? "⏱️ 【增肌期】52 歲肌肉生長極慢，這是一場 16-24 週的持久戰。力量進步就是肌肉進步！" 
-            : "⏱️ 【減脂期】每週體重下降約 0.5%，確保蛋白質充足，守住現有力量。";
-            
+            ? "⏱️ 【增肌期】52 歲肌肉生長較慢，力量進步就是肌肉進步！請耐心累積。" 
+            : "⏱️ 【減脂期】每週體重下降約 0.5%，守住力量最重要。";
+
         document.getElementById('result-section').style.display = 'block';
         if (!isUpdate) {
             updateChart();
             document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
         }
     }
+
+    window.onload = () => {
+        updateChart();
+    };
 </script>
 </body>
 </html>
