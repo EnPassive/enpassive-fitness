@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EnPassive｜高階體態增肌系統 v5.0</title>
+    <title>EnPassive｜高階體態增肌系統 v5.1</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
@@ -36,9 +36,7 @@
         .ex-name { font-weight: 800; color: var(--text); font-size: 16px; margin-bottom: 9px; }
         .ex-name a { color: #ea580c; text-decoration: none; margin-left: 8px; font-size: 13px; }
         
-        .safety-note { font-size: 13px; color: var(--warning); background: #fef3c7; padding: 9px 11px; border-radius: 6px; margin: 9px 0; border-left: 3px solid #f59e0b; }
-        
-        .tracking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 11px; }
+        .tracking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 5px; }
         .track-box { background: #f1f5f9; padding: 11px; border-radius: 8px; font-size: 13.5px; }
         .benchmark-val { color: #166534; font-weight: bold; }
         
@@ -66,8 +64,8 @@
 <body>
 
 <div class="container">
-    <h1>EnPassive｜高階體態增肌系統 v5.0</h1>
-    <p class="subtitle">穩定漸進・科學參數・安全防護機制</p>
+    <h1>EnPassive｜高階體態增肌系統 v5.1</h1>
+    <p class="subtitle">漸進超負荷演算法・科學訓練容量追蹤</p>
     <div class="grid">
         <div class="form-group"><label>年齡</label><input type="number" id="age" value="52" onchange="debouncedGenerate()"></div>
         <div class="form-group"><label>體重 (kg)</label><input type="number" id="weight" value="57" step="0.1" onchange="debouncedGenerate()"></div>
@@ -117,7 +115,7 @@
 
 <script src="data.js"></script>
 <script>
-    const USER_HEIGHT = 165; // 集中管理身高常數，避免硬編碼隱患
+    const USER_HEIGHT = 165; 
     let myChart = null;
     let debounceTimer = null;
 
@@ -132,10 +130,9 @@
         let r = 0;
         for (let k in ratios) if (name.includes(k)) r = ratios[k];
         let base = r === 0 ? 20 : Math.round((weight * r * ageFactor) / 2.5) * 2.5;
-        return base + "kg（建議從 60-70% 負重啟動）";
+        return base + "kg";
     }
 
-    // 使用永久穩定的 Key，確保未來更新版本紀錄不遺失
     function generateCleanKey(exName) {
         return 'en_log_prod_' + exName.replace(/[\s\(\)\/]/g, '_');
     }
@@ -152,15 +149,25 @@
         }
     }
 
+    // 導入文章科學邏輯：計算容量與精準加重時機
     function calculateProgression(lastVal) {
-        if (lastVal === '尚未記錄') return "💡 初次訓練：專注肌肉感受度與 3-1 節奏，尋找啟動重量。";
+        if (lastVal === '尚未記錄') return ""; 
         const match = lastVal.match(/(\d+\.?\d*)\s*[kK]?[gG]?\s*[\*xX\s]\s*(\d+)/);
         if (match) {
             const w = parseFloat(match[1]);
             const r = parseInt(match[2]);
-            return `💡 下次建議挑戰：<b>${w + 1.25}~2.5kg × ${r}</b> 或 <b>${w}kg × ${r + 1}次</b>`;
+            const volume = Math.round(w * r); // 單組容量
+            
+            // 演算法：大於等於 9 下建議加重，小於 8 下建議維持重量衝次數
+            let tip = "";
+            if (r >= 9) {
+                tip = `💡 達標！下次挑戰 <b>${w + 1.25}~2.5kg</b>`;
+            } else {
+                tip = `💡 維持 <b>${w}kg</b>，下次目標突破 8-9 下`;
+            }
+            return `容量(Volume): <b>${volume}</b> <span style="margin: 0 5px; color:#cbd5e1;">|</span> ${tip}`;
         }
-        return "💡 穩定推進：建議下次微幅加重 1.25kg 或增加 1-2 次。";
+        return "";
     }
 
     function clearAllRecords() {
@@ -247,13 +254,15 @@
                     const bench = getStrengthStandard(ex.name, weight, age);
                     const tip = calculateProgression(lastVal);
                     
+                    // 根據使用者要求：完全隱藏「尚未紀錄」時的多餘提示與安全廢話
+                    const tipHtml = tip ? `<div class="track-box" style="grid-column: span 2; background: #fefce8; color: var(--warning);">${tip}</div>` : '';
+
                     dayHtml += `<div class="exercise-item">
-                        <div class="ex-name">${ex.name} <a href="https://www.youtube.com/watch?v=${ex.vid}" target="_blank">🎥 教學影片</a></div>
-                        <div class="safety-note">⚠️ 嚴格「3秒下、1秒上」・姿勢正確優先・關節不適立即停止・建議從標竿重量的 60-70% 開始</div>
+                        <div class="ex-name">${ex.name} <a href="https://www.youtube.com/watch?v=${ex.vid}" target="_blank">🎥 影片</a></div>
                         <div class="tracking-grid">
-                            <div class="track-box">標竿預估：<span class="benchmark-val">${bench}</span></div>
-                            <div class="track-box">上週成績：${lastVal}</div>
-                            <div class="track-box" style="grid-column: span 2; background: #fefce8; color: var(--warning);">${tip}</div>
+                            <div class="track-box">建議啟動：<span class="benchmark-val">${bench}</span></div>
+                            <div class="track-box">上週：${lastVal}</div>
+                            ${tipHtml}
                             <div class="record-input-group">
                                 <input type="text" id="input_${key}" class="record-input" placeholder="本次成績 (例: 45kg x 10)">
                                 <button onclick="saveExRecord('${ex.name}')" class="save-btn">儲存</button>
