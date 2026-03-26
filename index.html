@@ -3,72 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EnPassive｜高階體態增肌系統 v4.4</title>
+    <title>EnPassive｜高階體態增肌系統 v5.0</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #2563eb; --secondary: #10b981; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b; --border: #e2e8f0; --accent: #f59e0b; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; line-height: 1.6; }
-        .container { max-width: 1000px; margin: 0 auto; background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: var(--primary); margin-bottom: 5px; font-size: 24px; }
-        .subtitle { text-align: center; color: var(--muted); margin-bottom: 25px; font-size: 14px; }
+        :root { 
+            --primary: #2563eb; --secondary: #10b981; --bg: #f8fafc; 
+            --card: #ffffff; --text: #1e293b; --muted: #64748b; 
+            --border: #e2e8f0; --accent: #f59e0b; --warning: #b45309;
+        }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; line-height: 1.5; }
+        .container { max-width: 1000px; margin: 0 auto; background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: var(--primary); font-size: 22px; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: var(--muted); font-size: 13.5px; margin-bottom: 20px; }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
         .form-group { display: flex; flex-direction: column; }
-        label { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: #334155; }
-        input, select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; background: #f1f5f9; }
+        label { font-weight: 600; margin-bottom: 4px; font-size: 12.5px; }
+        input, select { padding: 9px; border: 1px solid var(--border); border-radius: 6px; font-size: 14.5px; }
         
-        button.main-btn { background: var(--primary); color: white; border: none; padding: 16px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 20px; }
-        button.main-btn:hover { background: #1d4ed8; }
+        button.main-btn { background: var(--primary); color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 15px; }
+        button.clear-btn { background: #ef4444; color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13.5px; }
         
-        #result-section { display: none; padding-top: 20px; border-top: 2px solid var(--border); }
-        .card { background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); border-left: 5px solid var(--primary); }
+        #result-section { display: none; }
+        .card { background: #f8fafc; padding: 16px; border-radius: 10px; margin-bottom: 18px; border-left: 4px solid var(--primary); }
         .card h3 { margin-top: 0; color: var(--primary); border-bottom: 1px dashed #cbd5e1; padding-bottom: 10px; font-size: 18px; }
         
-        .macro-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; text-align: center; margin-top: 15px; }
+        .workout-day-box { margin-bottom: 28px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .day-header { background: #e2e8f0; padding: 13px; font-weight: bold; display: flex; justify-content: space-between; font-size: 15.5px; align-items: center; }
+        
+        .exercise-item { padding: 17px; border-bottom: 1px solid var(--border); }
+        .exercise-item:last-child { border-bottom: none; }
+        .ex-name { font-weight: 800; color: var(--text); font-size: 16px; margin-bottom: 9px; }
+        .ex-name a { color: #ea580c; text-decoration: none; margin-left: 8px; font-size: 13px; }
+        
+        .safety-note { font-size: 13px; color: var(--warning); background: #fef3c7; padding: 9px 11px; border-radius: 6px; margin: 9px 0; border-left: 3px solid #f59e0b; }
+        
+        .tracking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 11px; }
+        .track-box { background: #f1f5f9; padding: 11px; border-radius: 8px; font-size: 13.5px; }
+        .benchmark-val { color: #166534; font-weight: bold; }
+        
+        .record-input-group { grid-column: span 2; display: flex; gap: 9px; margin-top: 9px; }
+        .record-input { flex: 1; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14.5px; box-sizing: border-box;}
+        .save-btn { background: var(--secondary); color: white; border: none; padding: 9px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13.5px; min-width: 70px; }
+        
+        .macro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; text-align: center; margin-bottom: 15px; }
         .macro-box { background: white; padding: 15px 5px; border-radius: 10px; border: 1px solid var(--border); }
-        .macro-val { font-size: 22px; font-weight: 800; }
-        
-        .log-container { display: flex; flex-direction: column; gap: 6px; }
-        .prev-data { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 8px; border-radius: 6px; border-left: 3px solid #94a3b8; }
-        .progression-tip { font-size: 12px; color: #b45309; background: #fffbeb; padding: 8px; border-radius: 6px; border-left: 3px solid #f59e0b; font-weight: 600; }
-        .benchmark { font-size: 12.5px; color: #166534; background: #dcfce7; padding: 4px 8px; border-radius: 6px; margin-bottom: 6px; display: block; font-weight: bold; }
-        .record-input { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; background: white; }
-        .save-btn { background: var(--secondary); color: white; border: none; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        
-        .chart-container { position: relative; height: 320px; margin-top: 15px; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: top; }
-        th { background: #e2e8f0; color: #334155; }
-        td a { color: #ea580c; text-decoration: none; font-weight: bold; background: #fff7ed; padding: 2px 4px; border-radius: 4px; }
-        
-        .milestone { text-align: center; font-weight: 600; color: #1e40af; background: #eff6ff; padding: 18px; border-radius: 10px; margin-top: 20px; border: 1px dashed #bfdbfe; font-size: 14px; }
-        .timing-box { margin-top: 15px; font-size: 14px; color: #334155; background: white; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
+        .macro-val { font-size: 18.5px; font-weight: 800; }
+        .macro-lbl { font-size: 10.5px; color: var(--muted); }
         .meal-option { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #e2e8f0; }
         .meal-option:last-child { border-bottom: none; }
+        .timing-box { font-size: 14px; color: #334155; background: white; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
+        
+        .chart-container { position: relative; height: 320px; margin-top: 15px; }
+        @media (max-width: 600px) {
+            .tracking-grid { grid-template-columns: 1fr; }
+            .record-input-group { flex-direction: column; }
+            .exercise-item { padding: 15px; }
+            .save-btn { min-width: auto; width: 100%; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>EnPassive｜高階體態增肌系統 v4.4</h1>
-    <p class="subtitle">每個動作獨立建議重量（隨年齡與體重即時調整）</p>
-
+    <h1>EnPassive｜高階體態增肌系統 v5.0</h1>
+    <p class="subtitle">穩定漸進・科學參數・安全防護機制</p>
     <div class="grid">
-        <div class="form-group"><label>年齡</label><input type="number" id="age" value="52"></div>
-        <div class="form-group"><label>身高 (cm)</label><input type="number" id="height" value="165"></div>
-        <div class="form-group"><label>體重 (kg)</label><input type="number" id="weight" value="57" step="0.1"></div>
+        <div class="form-group"><label>年齡</label><input type="number" id="age" value="52" onchange="debouncedGenerate()"></div>
+        <div class="form-group"><label>體重 (kg)</label><input type="number" id="weight" value="57" step="0.1" onchange="debouncedGenerate()"></div>
         <div class="form-group">
             <label>訓練模式</label>
-            <select id="workoutMode"><option value="mode_a" selected>週末重裝＋平日居家</option><option value="mode_b">全居家啞鈴模式</option></select>
+            <select id="workoutMode"><option value="mode_a">週末重裝＋平日居家</option></select>
         </div>
         <div class="form-group">
             <label>主要目標</label>
-            <select id="goal"><option value="muscle" selected>乾淨增肌</option><option value="fatloss">高效減脂</option></select>
+            <select id="goal"><option value="muscle">乾淨增肌</option><option value="fatloss">高效減脂</option></select>
         </div>
     </div>
-
-    <button class="main-btn" onclick="generatePlan()">🚀 啟動我的科學化課表</button>
-
+    <button class="main-btn" onclick="generatePlan()">🚀 啟動 / 更新個人化參數</button>
+    
     <div id="result-section">
         <div class="card" style="border-left-color: var(--accent);">
             <h3>📈 體態發展趨勢</h3>
@@ -76,7 +89,7 @@
                 <input type="date" id="stat-date" style="flex:1;">
                 <input type="number" id="stat-weight" placeholder="體重" step="0.1" style="flex:1;">
                 <input type="number" id="stat-waist" placeholder="腰圍" step="0.1" style="flex:1;">
-                <button class="save-btn" style="padding:0 15px;" onclick="addStat()">新增數據</button>
+                <button onclick="addStat()" style="padding:0 15px; width:auto;" class="save-btn">新增紀錄</button>
             </div>
             <div class="chart-container"><canvas id="growthChart"></canvas></div>
         </div>
@@ -84,8 +97,8 @@
         <div class="card">
             <h3>🍽️ 巨量營養素與飲食建議</h3>
             <div class="macro-grid">
-                <div class="macro-box"><div class="macro-val" id="t-cal" style="color:#2563eb;">0</div><div class="macro-lbl">總熱量(kcal)</div></div>
-                <div class="macro-box"><div class="macro-val" id="t-pro" style="color:#ea580c;">0</div><div class="macro-lbl">蛋白質(g)</div></div>
+                <div class="macro-box"><div class="macro-val" id="t-cal" style="color:#2563eb;">0</div><div class="macro-lbl">熱量(kcal)</div></div>
+                <div class="macro-box"><div class="macro-val" id="t-pro" style="color:#ea580c;">0</div><div class="macro-lbl">蛋白(g)</div></div>
                 <div class="macro-box"><div class="macro-val" id="t-fat" style="color:#047857;">0</div><div class="macro-lbl">脂肪(g)</div></div>
                 <div class="macro-box"><div class="macro-val" id="t-car" style="color:#7e22ce;">0</div><div class="macro-lbl">碳水(g)</div></div>
             </div>
@@ -93,61 +106,67 @@
         </div>
 
         <div class="card">
-            <h3 id="workout-title">🏋️‍♂️ 專屬訓練課表</h3>
-            <p id="workout-desc" style="font-size: 13px; color: var(--muted); margin-bottom: 10px;"></p>
-            <div style="overflow-x: auto;">
-                <table id="workout-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 12%;">天數</th>
-                            <th style="width: 15%;">重點</th>
-                            <th style="width: 35%;">動作 (🎥教學)</th>
-                            <th style="width: 20%;">建議起始重量</th>
-                            <th style="width: 18%;">💪 本次紀錄</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <h3>🏋️‍♂️ 科學訓練課表</h3>
+            <div id="workout-container"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="clear-btn" onclick="clearAllRecords()">⚠️ 清除所有歷史紀錄</button>
             </div>
         </div>
-
-        <div class="milestone" id="milestone-text"></div>
     </div>
 </div>
 
 <script src="data.js"></script>
 <script>
+    const USER_HEIGHT = 165; // 集中管理身高常數，避免硬編碼隱患
     let myChart = null;
+    let debounceTimer = null;
 
-    // 每個動作獨立計算建議起始重量（隨年齡與體重即時調整）
-    function getSuggestedWeight(routineHTML, bodyWeight, userAge) {
-        const bw = bodyWeight || 57;
-        const age = userAge || 52;
-        
-        let ageFactor = 1.0;
-        if (age >= 55) ageFactor = 0.78;
-        else if (age >= 50) ageFactor = 0.85;
-        else if (age >= 40) ageFactor = 0.92;
-
-        const text = routineHTML.toLowerCase();
-
-        if (text.includes("深蹲")) return `${Math.round(bw * 0.55 * ageFactor)}~${Math.round(bw * 0.85 * ageFactor)} kg`;
-        if (text.includes("腿舉")) return `${Math.round(bw * 0.8 * ageFactor)}~${Math.round(bw * 1.2 * ageFactor)} kg`;
-        if (text.includes("硬舉") || text.includes("rdl")) return `${Math.round(bw * 0.65 * ageFactor)}~${Math.round(bw * 0.95 * ageFactor)} kg`;
-        if (text.includes("臥推")) return `${Math.round(bw * 0.35 * ageFactor)}~${Math.round(bw * 0.6 * ageFactor)} kg`;
-        if (text.includes("肩推")) return `${Math.round(bw * 0.3 * ageFactor)}~${Math.round(bw * 0.5 * ageFactor)} kg`;
-        if (text.includes("下拉") || text.includes("划船")) return `${Math.round(bw * 0.45 * ageFactor)}~${Math.round(bw * 0.7 * ageFactor)} kg`;
-        if (text.includes("引體向上")) return "體重輔助或彈力帶";
-        if (text.includes("二頭") || text.includes("三頭") || text.includes("腿彎舉")) return `${Math.round(bw * 0.2 * ageFactor)}~${Math.round(bw * 0.35 * ageFactor)} kg`;
-        
-        return "依個人能力調整";
+    function debouncedGenerate() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => generatePlan(true), 300);
     }
 
-    function saveRecord(key) {
-        const val = document.getElementById(`input_${key}`).value.trim();
+    function getStrengthStandard(name, weight, age) {
+        const ageFactor = age > 50 ? 0.75 : 0.88;
+        const ratios = { "深蹲": 0.75, "腿舉": 1.8, "硬舉": 0.9, "臥推": 0.55, "划船": 0.55, "肩推": 0.35 };
+        let r = 0;
+        for (let k in ratios) if (name.includes(k)) r = ratios[k];
+        let base = r === 0 ? 20 : Math.round((weight * r * ageFactor) / 2.5) * 2.5;
+        return base + "kg（建議從 60-70% 負重啟動）";
+    }
+
+    // 使用永久穩定的 Key，確保未來更新版本紀錄不遺失
+    function generateCleanKey(exName) {
+        return 'en_log_prod_' + exName.replace(/[\s\(\)\/]/g, '_');
+    }
+
+    function saveExRecord(exName) {
+        const key = generateCleanKey(exName);
+        const val = document.getElementById('input_' + key).value.trim();
         if (val) {
             localStorage.setItem(key, val);
-            alert("成績已儲存！");
+            alert("✅ 紀錄已成功儲存！");
+            generatePlan(true);
+        } else {
+            alert("請輸入本次成績（例如：45kg x 10）");
+        }
+    }
+
+    function calculateProgression(lastVal) {
+        if (lastVal === '尚未記錄') return "💡 初次訓練：專注肌肉感受度與 3-1 節奏，尋找啟動重量。";
+        const match = lastVal.match(/(\d+\.?\d*)\s*[kK]?[gG]?\s*[\*xX\s]\s*(\d+)/);
+        if (match) {
+            const w = parseFloat(match[1]);
+            const r = parseInt(match[2]);
+            return `💡 下次建議挑戰：<b>${w + 1.25}~2.5kg × ${r}</b> 或 <b>${w}kg × ${r + 1}次</b>`;
+        }
+        return "💡 穩定推進：建議下次微幅加重 1.25kg 或增加 1-2 次。";
+    }
+
+    function clearAllRecords() {
+        if (confirm("確定清除所有訓練紀錄嗎？此動作無法復原。")) {
+            localStorage.clear();
+            alert("所有紀錄已重置。");
             generatePlan(true);
         }
     }
@@ -156,8 +175,7 @@
         const date = document.getElementById('stat-date').value;
         const weight = parseFloat(document.getElementById('stat-weight').value);
         const waist = parseFloat(document.getElementById('stat-waist').value) || 0;
-        if (!date || !weight) return alert("請填寫日期與體重");
-
+        if (!date || !weight) return alert("請輸入日期與體重");
         let stats = JSON.parse(localStorage.getItem('EnPassiveStats') || '[]');
         stats.push({ date, weight, waist });
         stats.sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -169,7 +187,8 @@
         const stats = JSON.parse(localStorage.getItem('EnPassiveStats') || '[]');
         if (stats.length === 0) return;
         if (myChart) myChart.destroy();
-        myChart = new Chart(document.getElementById('growthChart'), {
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        myChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: stats.map(s => s.date),
@@ -178,108 +197,82 @@
                     { label: '腰圍(cm)', data: stats.map(s => s.waist), borderColor: '#ea580c', tension: 0.2, yAxisID: 'y1' }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false, scales: { 
-                y: { position: 'left', title: { display: true, text: 'kg' } },
-                y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'cm' } }
-            }}
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }
         });
     }
 
-    function calculateProgression(lastVal) {
-        const match = lastVal.match(/(\d+\.?\d*)\s*[kK]?[gG]?\s*[\*xX\s]\s*(\d+)/);
-        if (match) {
-            const w = parseFloat(match[1]);
-            const r = parseInt(match[2]);
-            return `💡 下週建議：${w + 1.25}~${w + 2.5}kg × ${r} 或 ${w}kg × ${r + 1}~2 次`;
-        }
-        return `💡 建議：增加重量 1.25~2.5kg 或多做 1-2 次`;
-    }
-
     function renderSection(title, data) {
+        if (!data || !Array.isArray(data)) return "";
         let html = `<strong>📍 ${title} (擇一)：</strong><div style="margin-top:8px;">`;
-        data.forEach(item => {
-            html += `<div class="meal-option"><strong>✔️ ${item.name}</strong><br><span style="color:var(--muted); font-size:12.5px;">${item.desc}</span></div>`;
+        data.forEach(item => { 
+            html += `<div class="meal-option"><strong>✔️ ${item.name}</strong><br><span style="color:var(--muted); font-size:12.5px;">${item.desc}</span></div>`; 
         });
         return html + `</div>`;
     }
 
     function generatePlan(isUpdate = false) {
-        const age = parseFloat(document.getElementById('age').value) || 52;
-        const height = parseFloat(document.getElementById('height').value) || 165;
         const weight = parseFloat(document.getElementById('weight').value) || 57;
+        const age = parseFloat(document.getElementById('age').value) || 52;
         const goal = document.getElementById('goal').value;
-        const mode = document.getElementById('workoutMode').value;
-
-        const bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
-        const targetCal = goal === 'muscle' ? (bmr * 1.55) + 350 : (bmr * 1.55) - 400;
         
-        const proteinGrams = Math.min(120, Math.max(110, Math.round(weight * 2.0)));
-        const fatGrams = Math.round((targetCal * 0.28) / 9);
-        const carbsGrams = Math.round((targetCal - (proteinGrams * 4) - (fatGrams * 9)) / 4);
+        const bmr = (10 * weight) + (6.25 * USER_HEIGHT) - (5 * age) + 5; 
+        const targetCal = goal === 'muscle' ? (bmr * 1.55) + 350 : (bmr * 1.55) - 400;
+        const pro = Math.round(weight * 2.0);
+        const fat = Math.round((targetCal * 0.28) / 9);
+        const car = Math.round((targetCal - (pro * 4) - (fat * 9)) / 4);
 
         document.getElementById('t-cal').innerText = Math.round(targetCal);
-        document.getElementById('t-pro').innerText = `${proteinGrams}g`;
-        document.getElementById('t-fat').innerText = `${fatGrams}g`;
-        document.getElementById('t-car').innerText = `${carbsGrams}g`;
+        document.getElementById('t-pro').innerText = pro + 'g';
+        document.getElementById('t-fat').innerText = fat + 'g';
+        document.getElementById('t-car').innerText = car + 'g';
 
         document.getElementById('meal-timing').innerHTML = 
-            renderSection("早餐", dietData.breakfast) + "<br>" +
-            renderSection("午餐", dietData.lunch) + "<br>" +
-            renderSection("晚餐", dietData.dinner) + "<br>" +
+            renderSection("早餐", dietData.breakfast) + 
+            renderSection("午餐", dietData.lunch) + 
+            renderSection("晚餐", dietData.dinner) + 
             renderSection("點心 / 訓練後", dietData.snack);
 
-        const wkData = workoutData[mode];
-        if (!wkData || !wkData.schedule) {
-            alert("❌ 訓練資料載入失敗！請確認 data.js 是否正確上傳。");
-            return;
-        }
+        const wkData = workoutData["mode_a"];
+        const container = document.getElementById('workout-container');
+        container.innerHTML = "";
 
-        document.getElementById('workout-title').innerText = `🏋️‍♂️ ${wkData.name}`;
-        document.getElementById('workout-desc').innerText = wkData.description || '';
-
-        const tbody = document.querySelector('#workout-table tbody');
-        tbody.innerHTML = wkData.schedule.map((day, index) => {
-            const key = `log_${mode}_${index}`;
-            const lastVal = localStorage.getItem(key) || '尚未記錄';
+        wkData.schedule.forEach((day) => {
+            let dayHtml = `<div class="workout-day-box">
+                <div class="day-header"><span>${day.day}</span><span>${day.focus}</span></div>`;
             
-            let tipHTML = '';
-            if (lastVal !== '尚未記錄' && day.type === '重訓') {
-                tipHTML = `<div class="progression-tip">${calculateProgression(lastVal)}</div>`;
+            if (day.type === "重訓" && day.exercises) {
+                day.exercises.forEach((ex) => {
+                    const key = generateCleanKey(ex.name);
+                    const lastVal = localStorage.getItem(key) || '尚未記錄';
+                    const bench = getStrengthStandard(ex.name, weight, age);
+                    const tip = calculateProgression(lastVal);
+                    
+                    dayHtml += `<div class="exercise-item">
+                        <div class="ex-name">${ex.name} <a href="https://www.youtube.com/watch?v=${ex.vid}" target="_blank">🎥 教學影片</a></div>
+                        <div class="safety-note">⚠️ 嚴格「3秒下、1秒上」・姿勢正確優先・關節不適立即停止・建議從標竿重量的 60-70% 開始</div>
+                        <div class="tracking-grid">
+                            <div class="track-box">標竿預估：<span class="benchmark-val">${bench}</span></div>
+                            <div class="track-box">上週成績：${lastVal}</div>
+                            <div class="track-box" style="grid-column: span 2; background: #fefce8; color: var(--warning);">${tip}</div>
+                            <div class="record-input-group">
+                                <input type="text" id="input_${key}" class="record-input" placeholder="本次成績 (例: 45kg x 10)">
+                                <button onclick="saveExRecord('${ex.name}')" class="save-btn">儲存</button>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            } else {
+                dayHtml += `<div style="padding:17px; color:var(--muted); font-size:13.5px;">${day.routine || "休息日"}</div>`;
             }
-
-            const suggested = getSuggestedWeight(day.routine, weight, age);
-
-            const recordHTML = day.type === '重訓' ? `
-                <div class="log-container">
-                    <div class="benchmark">🏆 建議起始重量：${suggested}</div>
-                    <div class="prev-data"><b>上週成績：</b>${lastVal}</div>
-                    ${tipHTML}
-                    <input type="text" id="input_${key}" class="record-input" placeholder="本日成績 (例如: 62.5kg x 8)">
-                    <button onclick="saveRecord('${key}')" class="save-btn">💾 儲存成績</button>
-                </div>` : `<span style="color:#94a3b8;">休息日 / 主動恢復</span>`;
-
-            return `<tr>
-                <td><strong>${day.day}</strong></td>
-                <td><span style="color:#475569; font-weight:600;">${day.focus}</span></td>
-                <td>${day.routine || '動作資料異常'}</td>
-                <td>${recordHTML}</td>
-            </tr>`;
-        }).join('');
-
-        document.getElementById('milestone-text').innerHTML = goal === 'muscle' 
-            ? "⏱️ 【增肌期】力量進步就是肌肉進步！請耐心累積。" 
-            : "⏱️ 【減脂期】每週體重下降約 0.5%，守住力量最重要。";
+            dayHtml += `</div>`;
+            container.innerHTML += dayHtml;
+        });
 
         document.getElementById('result-section').style.display = 'block';
-        if (!isUpdate) {
-            updateChart();
-            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
-        }
+        if (!isUpdate) updateChart();
     }
 
-    window.onload = () => {
-        updateChart();
-    };
+    window.onload = () => generatePlan();
 </script>
 </body>
 </html>
