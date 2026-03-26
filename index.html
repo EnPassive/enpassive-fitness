@@ -2,8 +2,17 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EnPassive｜高階體態增肌系統 v5.2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EnPassive｜高階體態增肌系統 v5.3</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EnPassive">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
@@ -11,7 +20,7 @@
             --card: #ffffff; --text: #1e293b; --muted: #64748b; 
             --border: #e2e8f0; --accent: #f59e0b; --warning: #b45309;
         }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; line-height: 1.5; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; line-height: 1.5; -webkit-tap-highlight-color: transparent; }
         .container { max-width: 1000px; margin: 0 auto; background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         h1 { text-align: center; color: var(--primary); font-size: 22px; margin-bottom: 5px; }
         .subtitle { text-align: center; color: var(--muted); font-size: 13.5px; margin-bottom: 20px; }
@@ -66,8 +75,8 @@
 <body>
 
 <div class="container">
-    <h1>EnPassive｜高階體態增肌系統 v5.2</h1>
-    <p class="subtitle">精準容量計算・分離式數據紀錄</p>
+    <h1>EnPassive｜高階體態增肌系統 v5.3</h1>
+    <p class="subtitle">PWA 手機 App 版・精準容量計算</p>
     <div class="grid">
         <div class="form-group"><label>年齡</label><input type="number" id="age" value="52" onchange="debouncedGenerate()"></div>
         <div class="form-group"><label>身高 (cm)</label><input type="number" id="height" value="165" onchange="debouncedGenerate()"></div>
@@ -145,7 +154,6 @@
         const rVal = document.getElementById('reps_' + key).value.trim();
         
         if (wVal && rVal) {
-            // 自動組合成統一格式，確保與舊版相容
             const val = `${wVal}kg x ${rVal}`;
             localStorage.setItem(key, val);
             alert("✅ 紀錄已成功儲存！");
@@ -227,7 +235,6 @@
         const age = parseFloat(document.getElementById('age').value) || 52;
         const goal = document.getElementById('goal').value;
         
-        // 導入身高參數的精準 BMR 公式
         const bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5; 
         const targetCal = goal === 'muscle' ? (bmr * 1.55) + 350 : (bmr * 1.55) - 400;
         const pro = Math.round(weight * 2.0);
@@ -250,7 +257,6 @@
         container.innerHTML = "";
 
         wkData.schedule.forEach((day) => {
-            // 1. 計算該天總容量
             let dailyVolume = 0;
             if (day.type === "重訓" && day.exercises) {
                 day.exercises.forEach((ex) => {
@@ -263,7 +269,6 @@
                 });
             }
 
-            // 2. 渲染表頭 (加入單天總容量標籤)
             const volumeTag = dailyVolume > 0 ? `<span class="daily-volume-tag">🔥 總容量: ${dailyVolume}</span>` : '';
             let dayHtml = `<div class="workout-day-box">
                 <div class="day-header">
@@ -274,7 +279,6 @@
                     <span>${day.focus}</span>
                 </div>`;
             
-            // 3. 渲染每個動作 (分離為重量與次數欄位)
             if (day.type === "重訓" && day.exercises) {
                 day.exercises.forEach((ex) => {
                     const key = generateCleanKey(ex.name);
@@ -307,6 +311,17 @@
 
         document.getElementById('result-section').style.display = 'block';
         if (!isUpdate) updateChart();
+    }
+
+    // PWA Service Worker 註冊
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').then((reg) => {
+                console.log('ServiceWorker 註冊成功', reg.scope);
+            }).catch((err) => {
+                console.log('ServiceWorker 註冊失敗', err);
+            });
+        });
     }
 
     window.onload = () => generatePlan();
