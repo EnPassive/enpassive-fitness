@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EnPassive｜高階體態增肌系統 v5.1</title>
+    <title>EnPassive｜高階體態增肌系統 v5.2</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
@@ -16,7 +16,7 @@
         h1 { text-align: center; color: var(--primary); font-size: 22px; margin-bottom: 5px; }
         .subtitle { text-align: center; color: var(--muted); font-size: 13.5px; margin-bottom: 20px; }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
         .form-group { display: flex; flex-direction: column; }
         label { font-weight: 600; margin-bottom: 4px; font-size: 12.5px; }
         input, select { padding: 9px; border: 1px solid var(--border); border-radius: 6px; font-size: 14.5px; }
@@ -29,7 +29,8 @@
         .card h3 { margin-top: 0; color: var(--primary); border-bottom: 1px dashed #cbd5e1; padding-bottom: 10px; font-size: 18px; }
         
         .workout-day-box { margin-bottom: 28px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .day-header { background: #e2e8f0; padding: 13px; font-weight: bold; display: flex; justify-content: space-between; font-size: 15.5px; align-items: center; }
+        .day-header { background: #e2e8f0; padding: 13px; font-weight: bold; display: flex; justify-content: space-between; font-size: 15.5px; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .daily-volume-tag { font-size: 12px; color: #ea580c; background: #ffedd5; padding: 3px 8px; border-radius: 6px; border: 1px solid #fdba74; }
         
         .exercise-item { padding: 17px; border-bottom: 1px solid var(--border); }
         .exercise-item:last-child { border-bottom: none; }
@@ -40,8 +41,9 @@
         .track-box { background: #f1f5f9; padding: 11px; border-radius: 8px; font-size: 13.5px; }
         .benchmark-val { color: #166534; font-weight: bold; }
         
-        .record-input-group { grid-column: span 2; display: flex; gap: 9px; margin-top: 9px; }
-        .record-input { flex: 1; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14.5px; box-sizing: border-box;}
+        .record-input-group { grid-column: span 2; display: flex; gap: 8px; margin-top: 9px; align-items: center; }
+        .record-input { flex: 1; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14.5px; box-sizing: border-box; text-align: center; }
+        .input-divider { font-weight: bold; color: var(--muted); }
         .save-btn { background: var(--secondary); color: white; border: none; padding: 9px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13.5px; min-width: 70px; }
         
         .macro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; text-align: center; margin-bottom: 15px; }
@@ -55,19 +57,20 @@
         .chart-container { position: relative; height: 320px; margin-top: 15px; }
         @media (max-width: 600px) {
             .tracking-grid { grid-template-columns: 1fr; }
-            .record-input-group { flex-direction: column; }
-            .exercise-item { padding: 15px; }
-            .save-btn { min-width: auto; width: 100%; }
+            .record-input-group { flex-wrap: wrap; }
+            .record-input { min-width: 30%; }
+            .save-btn { width: 100%; margin-top: 5px; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>EnPassive｜高階體態增肌系統 v5.1</h1>
-    <p class="subtitle">漸進超負荷演算法・科學訓練容量追蹤</p>
+    <h1>EnPassive｜高階體態增肌系統 v5.2</h1>
+    <p class="subtitle">精準容量計算・分離式數據紀錄</p>
     <div class="grid">
         <div class="form-group"><label>年齡</label><input type="number" id="age" value="52" onchange="debouncedGenerate()"></div>
+        <div class="form-group"><label>身高 (cm)</label><input type="number" id="height" value="165" onchange="debouncedGenerate()"></div>
         <div class="form-group"><label>體重 (kg)</label><input type="number" id="weight" value="57" step="0.1" onchange="debouncedGenerate()"></div>
         <div class="form-group">
             <label>訓練模式</label>
@@ -115,7 +118,6 @@
 
 <script src="data.js"></script>
 <script>
-    const USER_HEIGHT = 165; 
     let myChart = null;
     let debounceTimer = null;
 
@@ -139,33 +141,35 @@
 
     function saveExRecord(exName) {
         const key = generateCleanKey(exName);
-        const val = document.getElementById('input_' + key).value.trim();
-        if (val) {
+        const wVal = document.getElementById('weight_' + key).value.trim();
+        const rVal = document.getElementById('reps_' + key).value.trim();
+        
+        if (wVal && rVal) {
+            // 自動組合成統一格式，確保與舊版相容
+            const val = `${wVal}kg x ${rVal}`;
             localStorage.setItem(key, val);
             alert("✅ 紀錄已成功儲存！");
             generatePlan(true);
         } else {
-            alert("請輸入本次成績（例如：45kg x 10）");
+            alert("請完整輸入重量與次數！");
         }
     }
 
-    // 導入文章科學邏輯：計算容量與精準加重時機
     function calculateProgression(lastVal) {
         if (lastVal === '尚未記錄') return ""; 
         const match = lastVal.match(/(\d+\.?\d*)\s*[kK]?[gG]?\s*[\*xX\s]\s*(\d+)/);
         if (match) {
             const w = parseFloat(match[1]);
             const r = parseInt(match[2]);
-            const volume = Math.round(w * r); // 單組容量
+            const volume = Math.round(w * r);
             
-            // 演算法：大於等於 9 下建議加重，小於 8 下建議維持重量衝次數
             let tip = "";
             if (r >= 9) {
                 tip = `💡 達標！下次挑戰 <b>${w + 1.25}~2.5kg</b>`;
             } else {
                 tip = `💡 維持 <b>${w}kg</b>，下次目標突破 8-9 下`;
             }
-            return `容量(Volume): <b>${volume}</b> <span style="margin: 0 5px; color:#cbd5e1;">|</span> ${tip}`;
+            return `容量(Vol): <b>${volume}</b> <span style="margin: 0 5px; color:#cbd5e1;">|</span> ${tip}`;
         }
         return "";
     }
@@ -219,10 +223,12 @@
 
     function generatePlan(isUpdate = false) {
         const weight = parseFloat(document.getElementById('weight').value) || 57;
+        const height = parseFloat(document.getElementById('height').value) || 165;
         const age = parseFloat(document.getElementById('age').value) || 52;
         const goal = document.getElementById('goal').value;
         
-        const bmr = (10 * weight) + (6.25 * USER_HEIGHT) - (5 * age) + 5; 
+        // 導入身高參數的精準 BMR 公式
+        const bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5; 
         const targetCal = goal === 'muscle' ? (bmr * 1.55) + 350 : (bmr * 1.55) - 400;
         const pro = Math.round(weight * 2.0);
         const fat = Math.round((targetCal * 0.28) / 9);
@@ -244,17 +250,37 @@
         container.innerHTML = "";
 
         wkData.schedule.forEach((day) => {
+            // 1. 計算該天總容量
+            let dailyVolume = 0;
+            if (day.type === "重訓" && day.exercises) {
+                day.exercises.forEach((ex) => {
+                    const key = generateCleanKey(ex.name);
+                    const lastVal = localStorage.getItem(key) || '';
+                    const match = lastVal.match(/(\d+\.?\d*)\s*[kK]?[gG]?\s*[\*xX\s]\s*(\d+)/);
+                    if (match) {
+                        dailyVolume += Math.round(parseFloat(match[1]) * parseInt(match[2]));
+                    }
+                });
+            }
+
+            // 2. 渲染表頭 (加入單天總容量標籤)
+            const volumeTag = dailyVolume > 0 ? `<span class="daily-volume-tag">🔥 總容量: ${dailyVolume}</span>` : '';
             let dayHtml = `<div class="workout-day-box">
-                <div class="day-header"><span>${day.day}</span><span>${day.focus}</span></div>`;
+                <div class="day-header">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span>${day.day}</span>
+                        ${volumeTag}
+                    </div>
+                    <span>${day.focus}</span>
+                </div>`;
             
+            // 3. 渲染每個動作 (分離為重量與次數欄位)
             if (day.type === "重訓" && day.exercises) {
                 day.exercises.forEach((ex) => {
                     const key = generateCleanKey(ex.name);
                     const lastVal = localStorage.getItem(key) || '尚未記錄';
                     const bench = getStrengthStandard(ex.name, weight, age);
                     const tip = calculateProgression(lastVal);
-                    
-                    // 根據使用者要求：完全隱藏「尚未紀錄」時的多餘提示與安全廢話
                     const tipHtml = tip ? `<div class="track-box" style="grid-column: span 2; background: #fefce8; color: var(--warning);">${tip}</div>` : '';
 
                     dayHtml += `<div class="exercise-item">
@@ -264,7 +290,9 @@
                             <div class="track-box">上週：${lastVal}</div>
                             ${tipHtml}
                             <div class="record-input-group">
-                                <input type="text" id="input_${key}" class="record-input" placeholder="本次成績 (例: 45kg x 10)">
+                                <input type="number" id="weight_${key}" class="record-input" placeholder="重量(kg)" step="0.5">
+                                <span class="input-divider">x</span>
+                                <input type="number" id="reps_${key}" class="record-input" placeholder="次數">
                                 <button onclick="saveExRecord('${ex.name}')" class="save-btn">儲存</button>
                             </div>
                         </div>
