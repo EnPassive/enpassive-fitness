@@ -13,7 +13,7 @@
     <meta name="apple-mobile-web-app-title" content="EnPassive">
     <link rel="apple-touch-icon" href="icon-192.png">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         :root { 
             --primary: #2563eb; --secondary: #10b981; --bg: #f8fafc; 
@@ -54,6 +54,8 @@
         .record-input { flex: 1; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14.5px; box-sizing: border-box; text-align: center; }
         .input-divider { font-weight: bold; color: var(--muted); }
         .save-btn { background: var(--secondary); color: white; border: none; padding: 9px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13.5px; min-width: 70px; }
+
+        .volume-chart-container { position: relative; height: 180px; margin-top: 15px; background: #f8fafc; border-radius: 8px; padding: 8px; }
         
         .macro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; text-align: center; margin-bottom: 15px; }
         .macro-box { background: white; padding: 15px 5px; border-radius: 10px; border: 1px solid var(--border); }
@@ -77,6 +79,7 @@
 <div class="container">
     <h1>EnPassive｜高階體態增肌系統 v5.3</h1>
     <p class="subtitle">PWA 手機 App 版・精準容量計算</p>
+    
     <div class="grid">
         <div class="form-group"><label>年齡</label><input type="number" id="age" value="52" onchange="debouncedGenerate()"></div>
         <div class="form-group"><label>身高 (cm)</label><input type="number" id="height" value="165" onchange="debouncedGenerate()"></div>
@@ -93,6 +96,7 @@
     <button class="main-btn" onclick="generatePlan()">🚀 啟動 / 更新個人化參數</button>
     
     <div id="result-section">
+        <!-- 1. 體態發展趨勢 -->
         <div class="card" style="border-left-color: var(--accent);">
             <h3>📈 體態發展趨勢</h3>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
@@ -104,6 +108,16 @@
             <div class="chart-container"><canvas id="growthChart"></canvas></div>
         </div>
 
+        <!-- 2. 科學訓練課表（已新增每個動作的容量曲線） -->
+        <div class="card">
+            <h3>🏋️‍♂️ 科學訓練課表</h3>
+            <div id="workout-container"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="clear-btn" onclick="clearAllRecords()">⚠️ 清除所有歷史紀錄</button>
+            </div>
+        </div>
+
+        <!-- 3. 飲食建議（已移到最下面） -->
         <div class="card">
             <h3>🍽️ 巨量營養素與飲食建議</h3>
             <div class="macro-grid">
@@ -113,14 +127,6 @@
                 <div class="macro-box"><div class="macro-val" id="t-car" style="color:#7e22ce;">0</div><div class="macro-lbl">碳水(g)</div></div>
             </div>
             <div id="meal-timing" class="timing-box"></div>
-        </div>
-
-        <div class="card">
-            <h3>🏋️‍♂️ 科學訓練課表</h3>
-            <div id="workout-container"></div>
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="clear-btn" onclick="clearAllRecords()">⚠️ 清除所有歷史紀錄</button>
-            </div>
         </div>
     </div>
 </div>
@@ -148,35 +154,48 @@
         return 'en_log_prod_' + exName.replace(/[\s\(\)\/]/g, '_');
     }
 
+    // 新增：取得單一動作的歷史紀錄（陣列）
+    function getExerciseHistory(exName) {
+        const key = generateCleanKey(exName);
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : [];
+    }
+
     function saveExRecord(exName) {
         const key = generateCleanKey(exName);
-        const wVal = document.getElementById('weight_' + key).value.trim();
-        const rVal = document.getElementById('reps_' + key).value.trim();
+        const wVal = parseFloat(document.getElementById('weight_' + key).value);
+        const rVal = parseInt(document.getElementById('reps_' + key).value);
         
-        if (wVal && rVal) {
-            const val = `${wVal}kg x ${rVal}`;
-            localStorage.setItem(key, val);
-            alert("✅ 紀錄已成功儲存！");
-            generatePlan(true);
-        } else {
-            alert("請完整輸入重量與次數！");
-        }
+        if (!wVal || !rVal) return alert("請完整輸入重量與次數！");
+        
+        let history = getExerciseHistory(exName);
+        const today = new Date().toISOString().split('T')[0];
+        
+        history.unshift({ 
+            date: today, 
+            weight: wVal, 
+            reps: rVal, 
+            volume: Math.round(wVal * rVal) 
+        });
+        
+        // 只保留最近20筆
+        if (history.length > 20) history.pop();
+        
+        localStorage.setItem(key, JSON.stringify(history));
+        alert("✅ 紀錄已成功儲存！");
+        generatePlan(true);
     }
 
     function calculateProgression(lastVal) {
-        if (lastVal === '尚未記錄') return ""; 
+        if (!lastVal) return ""; 
         const match = lastVal.match(/(\d+\.?\d*)\s*[kK]?[gG]?\s*[\*xX\s]\s*(\d+)/);
         if (match) {
             const w = parseFloat(match[1]);
             const r = parseInt(match[2]);
             const volume = Math.round(w * r);
-            
-            let tip = "";
-            if (r >= 9) {
-                tip = `💡 達標！下次挑戰 <b>${w + 1.25}~2.5kg</b>`;
-            } else {
-                tip = `💡 維持 <b>${w}kg</b>，下次目標突破 8-9 下`;
-            }
+            let tip = r >= 9 
+                ? `💡 達標！下次挑戰 <b>${w + 1.25}~2.5kg</b>` 
+                : `💡 維持 <b>${w}kg</b>，下次目標突破 8-9 下`;
             return `容量(Vol): <b>${volume}</b> <span style="margin: 0 5px; color:#cbd5e1;">|</span> ${tip}`;
         }
         return "";
@@ -190,7 +209,7 @@
         }
     }
 
-    function addStat() {
+    function addStat() { /* 保持不變 */ 
         const date = document.getElementById('stat-date').value;
         const weight = parseFloat(document.getElementById('stat-weight').value);
         const waist = parseFloat(document.getElementById('stat-waist').value) || 0;
@@ -202,15 +221,14 @@
         updateChart();
     }
 
-    function updateChart() {
+    function updateChart() { /* 保持不變 */ 
         const stats = JSON.parse(localStorage.getItem('EnPassiveStats') || '[]');
         if (stats.length === 0) return;
         if (myChart) myChart.destroy();
         const ctx = document.getElementById('growthChart').getContext('2d');
         myChart = new Chart(ctx, {
             type: 'line',
-            data: {
-                labels: stats.map(s => s.date),
+            data: { labels: stats.map(s => s.date),
                 datasets: [
                     { label: '體重(kg)', data: stats.map(s => s.weight), borderColor: '#2563eb', tension: 0.2, yAxisID: 'y' },
                     { label: '腰圍(cm)', data: stats.map(s => s.waist), borderColor: '#ea580c', tension: 0.2, yAxisID: 'y1' }
@@ -218,6 +236,46 @@
             },
             options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }
         });
+    }
+
+    // 新增：為每個動作繪製容量曲線圖
+    function renderVolumeChart(exName, container) {
+        const history = getExerciseHistory(exName);
+        if (history.length < 2) {
+            container.innerHTML = `<div style="color:#64748b; font-size:13px; text-align:center; padding:20px;">還沒有足夠紀錄，儲存後會顯示容量進步曲線</div>`;
+            return;
+        }
+        
+        const chartDiv = document.createElement('div');
+        chartDiv.className = 'volume-chart-container';
+        chartDiv.innerHTML = `<canvas id="volChart_${generateCleanKey(exName)}"></canvas>`;
+        container.appendChild(chartDiv);
+
+        setTimeout(() => {
+            const ctx = document.getElementById(`volChart_${generateCleanKey(exName)}`);
+            if (!ctx) return;
+            new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: history.map(h => h.date),
+                    datasets: [{
+                        label: '容量 (kg×次)',
+                        data: history.map(h => h.volume),
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.3,
+                        borderWidth: 3,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, title: { display: true, text: '容量' } } }
+                }
+            });
+        }, 50);
     }
 
     function renderSection(title, data) {
@@ -246,12 +304,6 @@
         document.getElementById('t-fat').innerText = fat + 'g';
         document.getElementById('t-car').innerText = car + 'g';
 
-        document.getElementById('meal-timing').innerHTML = 
-            renderSection("早餐", dietData.breakfast) + 
-            renderSection("午餐", dietData.lunch) + 
-            renderSection("晚餐", dietData.dinner) + 
-            renderSection("點心 / 訓練後", dietData.snack);
-
         const wkData = workoutData["mode_a"];
         const container = document.getElementById('workout-container');
         container.innerHTML = "";
@@ -260,11 +312,9 @@
             let dailyVolume = 0;
             if (day.type === "重訓" && day.exercises) {
                 day.exercises.forEach((ex) => {
-                    const key = generateCleanKey(ex.name);
-                    const lastVal = localStorage.getItem(key) || '';
-                    const match = lastVal.match(/(\d+\.?\d*)\s*[kK]?[gG]?\s*[\*xX\s]\s*(\d+)/);
-                    if (match) {
-                        dailyVolume += Math.round(parseFloat(match[1]) * parseInt(match[2]));
+                    const history = getExerciseHistory(ex.name);
+                    if (history.length > 0) {
+                        dailyVolume += history[0].volume;
                     }
                 });
             }
@@ -282,17 +332,17 @@
             if (day.type === "重訓" && day.exercises) {
                 day.exercises.forEach((ex) => {
                     const key = generateCleanKey(ex.name);
-                    const lastVal = localStorage.getItem(key) || '尚未記錄';
+                    const history = getExerciseHistory(ex.name);
+                    const lastVal = history.length > 0 ? `${history[0].weight}kg x ${history[0].reps}` : '尚未記錄';
                     const bench = getStrengthStandard(ex.name, weight, age);
                     const tip = calculateProgression(lastVal);
-                    const tipHtml = tip ? `<div class="track-box" style="grid-column: span 2; background: #fefce8; color: var(--warning);">${tip}</div>` : '';
 
                     dayHtml += `<div class="exercise-item">
                         <div class="ex-name">${ex.name} <a href="https://www.youtube.com/watch?v=${ex.vid}" target="_blank">🎥 影片</a></div>
                         <div class="tracking-grid">
                             <div class="track-box">建議啟動：<span class="benchmark-val">${bench}</span></div>
-                            <div class="track-box">上週：${lastVal}</div>
-                            ${tipHtml}
+                            <div class="track-box">最近一次：${lastVal}</div>
+                            ${tip ? `<div class="track-box" style="grid-column: span 2; background: #fefce8; color: var(--warning);">${tip}</div>` : ''}
                             <div class="record-input-group">
                                 <input type="number" id="weight_${key}" class="record-input" placeholder="重量(kg)" step="0.5">
                                 <span class="input-divider">x</span>
@@ -300,6 +350,7 @@
                                 <button onclick="saveExRecord('${ex.name}')" class="save-btn">儲存</button>
                             </div>
                         </div>
+                        <div id="volume-chart-${key}"></div>
                     </div>`;
                 });
             } else {
@@ -309,11 +360,30 @@
             container.innerHTML += dayHtml;
         });
 
+        // 渲染每個動作的容量曲線
+        setTimeout(() => {
+            wkData.schedule.forEach((day) => {
+                if (day.type === "重訓" && day.exercises) {
+                    day.exercises.forEach((ex) => {
+                        const chartContainer = document.getElementById(`volume-chart-${generateCleanKey(ex.name)}`);
+                        if (chartContainer) renderVolumeChart(ex.name, chartContainer);
+                    });
+                }
+            });
+        }, 100);
+
+        // 飲食建議（已移到最後）
+        document.getElementById('meal-timing').innerHTML = 
+            renderSection("早餐", dietData.breakfast) + 
+            renderSection("午餐", dietData.lunch) + 
+            renderSection("晚餐", dietData.dinner) + 
+            renderSection("點心 / 訓練後", dietData.snack);
+
         document.getElementById('result-section').style.display = 'block';
         if (!isUpdate) updateChart();
     }
 
-    // PWA Service Worker 註冊
+    // PWA Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js').then((reg) => {
