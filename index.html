@@ -8,6 +8,10 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
     
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <link rel="icon" type="image/png" href="icon-192.png">
+
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="EnPassive">
@@ -96,7 +100,6 @@
     <button class="main-btn" onclick="generatePlan()">🚀 啟動 / 更新個人化參數</button>
     
     <div id="result-section">
-        <!-- 1. 體態發展趨勢 -->
         <div class="card" style="border-left-color: var(--accent);">
             <h3>📈 體態發展趨勢</h3>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
@@ -108,7 +111,6 @@
             <div class="chart-container"><canvas id="growthChart"></canvas></div>
         </div>
 
-        <!-- 2. 科學訓練課表（已新增每個動作的容量曲線） -->
         <div class="card">
             <h3>🏋️‍♂️ 科學訓練課表</h3>
             <div id="workout-container"></div>
@@ -117,7 +119,6 @@
             </div>
         </div>
 
-        <!-- 3. 飲食建議（已移到最下面） -->
         <div class="card">
             <h3>🍽️ 巨量營養素與飲食建議</h3>
             <div class="macro-grid">
