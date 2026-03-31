@@ -1,4 +1,4 @@
-// EnPassive Data Storage v5.1 - 正式版（含擴充飲食選項）
+// EnPassive Data Storage v5.4 - 正式版（修正課表與影片）
 
 const dietData = {
     breakfast: [
@@ -52,7 +52,7 @@ const workoutData = {
                     { name: "滑輪下拉 (或輔助引體向上)", vid: "AOpi-p0cJkc" },
                     { name: "機械划船", vid: "GZbfZ033f74" },
                     { name: "繩索三頭下壓", vid: "2-LAMcpzODU" },
-                    { name: "蝴蝶擴胸訓練機 (Pec Deck Fly)", vid: "fEOl1ZzWzNs" } // 🌟 新增：蝴蝶擴胸機
+                    { name: "蝴蝶擴胸訓練機 (Pec Deck Fly)", vid: "fEOl1ZzWzNs" }
                 ]
             },
             { 
@@ -61,10 +61,10 @@ const workoutData = {
                 focus: "下肢大重量 (關節保護版)",
                 exercises: [
                     { name: "槓鈴深蹲 (或高腳杯深蹲/椅子輔助)", vid: "dO-51htz_eA" },
-                    { name: "腿舉機 (Leg Press)", vid: "vZ9rufloaoo" }, // 🌟 更新：修正失效的影片連結
+                    { name: "腿舉機 (Leg Press)", vid: "vZ9rufloaoo" },
                     { name: "六角槓硬舉 (Trap Bar) 或箱上硬舉", vid: "hQgFixeXdZo" },
                     { name: "坐姿腿彎舉", vid: "F488k67BTNo" },
-                    { name: "髖內收機 (Hip Adductor)", vid: "4pfeckTaLOg" } // 🌟 新增：髖內收機
+                    { name: "髖內收機 (Hip Adductor)", vid: "4pfeckTaLOg" }
                 ]
             },
             { 
@@ -76,21 +76,24 @@ const workoutData = {
             { 
                 day: "週二/三 (居家啞鈴)", 
                 type: "重訓", 
-                focus: "下肢維持 (安全版)",
-                exercises: [
-                    { name: "保加利亞單腿蹲 (椅子輔助)", vid: "vLuhN_glFZ8" },
-                    { name: "啞鈴高腳杯深蹲", vid: "MeIiIdhgPwg" },
-                    { name: "啞鈴臀橋 (Glute Bridge)", vid: "hQgFixeXdZo" }
-                ]
-            },
-            { 
-                day: "週四/五 (居家啞鈴)", 
-                type: "重訓", 
+                // 🔄 修改 1：週二/三改為上肢維持
                 focus: "上肢維持",
                 exercises: [
                     { name: "輔助引體向上 或 啞鈴划船", vid: "ZHllQTJf7eA" },
                     { name: "啞鈴地板臥推", vid: "uUGDRwge4F8" },
                     { name: "啞鈴肩推 (坐姿)", vid: "qEwKCR5JCog" }
+                ]
+            },
+            { 
+                day: "週四/五 (居家啞鈴)", 
+                type: "重訓", 
+                // 🔄 修改 1：週四/五改為下肢維持
+                focus: "下肢維持 (安全版)",
+                exercises: [
+                    { name: "保加利亞單腿蹲 (椅子輔助)", vid: "vLuhN_glFZ8" },
+                    { name: "啞鈴高腳杯深蹲", vid: "MeIiIdhgPwg" },
+                    // 🔄 修改 2：修正啞鈴臀橋影片，改為標準啞鈴臀推教學
+                    { name: "啞鈴臀橋 (Glute Bridge)", vid: "h8Z0-31R08k" }
                 ]
             }
         ]
