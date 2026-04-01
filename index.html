@@ -154,7 +154,6 @@
         return 'en_log_prod_' + exName.replace(/[\s\(\)\/]/g, '_');
     }
 
-    // 新增：取得單一動作的歷史紀錄（陣列）
     function getExerciseHistory(exName) {
         const key = generateCleanKey(exName);
         const data = localStorage.getItem(key);
@@ -169,7 +168,10 @@
         if (!wVal || !rVal) return alert("請完整輸入重量與次數！");
         
         let history = getExerciseHistory(exName);
-        const today = new Date().toISOString().split('T')[0];
+        
+        // 修正 1：取得本地時間，避免 UTC 時差導致紀錄卡在昨天
+        const tzOffset = (new Date()).getTimezoneOffset() * 60000;
+        const today = (new Date(Date.now() - tzOffset)).toISOString().split('T')[0];
         
         history.unshift({ 
             date: today, 
@@ -178,7 +180,6 @@
             volume: Math.round(wVal * rVal) 
         });
         
-        // 只保留最近20筆
         if (history.length > 20) history.pop();
         
         localStorage.setItem(key, JSON.stringify(history));
@@ -209,7 +210,7 @@
         }
     }
 
-    function addStat() { /* 保持不變 */ 
+    function addStat() { 
         const date = document.getElementById('stat-date').value;
         const weight = parseFloat(document.getElementById('stat-weight').value);
         const waist = parseFloat(document.getElementById('stat-waist').value) || 0;
@@ -221,7 +222,7 @@
         updateChart();
     }
 
-    function updateChart() { /* 保持不變 */ 
+    function updateChart() { 
         const stats = JSON.parse(localStorage.getItem('EnPassiveStats') || '[]');
         if (stats.length === 0) return;
         if (myChart) myChart.destroy();
@@ -238,7 +239,6 @@
         });
     }
 
-    // 新增：為每個動作繪製容量曲線圖
     function renderVolumeChart(exName, container) {
         const history = getExerciseHistory(exName);
         if (history.length < 2) {
@@ -254,13 +254,17 @@
         setTimeout(() => {
             const ctx = document.getElementById(`volChart_${generateCleanKey(exName)}`);
             if (!ctx) return;
+            
+            // 修正 2：將資料複製並反轉，讓圖表 X 軸呈現舊到新 (左到右)
+            const chartData = [...history].reverse();
+            
             new Chart(ctx.getContext('2d'), {
                 type: 'line',
                 data: {
-                    labels: history.map(h => h.date),
+                    labels: chartData.map(h => h.date),
                     datasets: [{
                         label: '容量 (kg×次)',
-                        data: history.map(h => h.volume),
+                        data: chartData.map(h => h.volume),
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
                         tension: 0.3,
@@ -360,7 +364,6 @@
             container.innerHTML += dayHtml;
         });
 
-        // 渲染每個動作的容量曲線
         setTimeout(() => {
             wkData.schedule.forEach((day) => {
                 if (day.type === "重訓" && day.exercises) {
@@ -372,7 +375,6 @@
             });
         }, 100);
 
-        // 飲食建議（已移到最後）
         document.getElementById('meal-timing').innerHTML = 
             renderSection("早餐", dietData.breakfast) + 
             renderSection("午餐", dietData.lunch) + 
@@ -383,7 +385,6 @@
         if (!isUpdate) updateChart();
     }
 
-    // PWA Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js').then((reg) => {
