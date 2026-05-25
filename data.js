@@ -1,4 +1,4 @@
-// EnPassive Data Storage v5.4 - 正式版（修正課表與影片）
+// EnPassive Data Storage v5.1 - 飲食選項擴充與課表設定版
 
 const dietData = {
     breakfast: [
@@ -40,60 +40,67 @@ const dietData = {
 
 const workoutData = {
     "mode_a": {
-        name: "週末重裝＋平日居家 (安全防護版)",
-        description: "週六上肢、週日下肢。嚴格執行「3秒下、1秒上」節奏，姿勢優先，關節不適立即停止。",
         schedule: [
-            { 
-                day: "週六 (健身房)", 
-                type: "重訓", 
-                focus: "上肢大重量",
+            {
+                day: "週一",
+                type: "休息",
+                focus: "活動度與伸展",
+                routine: "15分鐘全身關節活動度訓練，可搭配滾筒放鬆。"
+            },
+            {
+                day: "週二",
+                type: "重訓",
+                focus: "上肢拉 (居家)",
                 exercises: [
-                    { name: "槓鈴臥推 (或啞鈴地板臥推)", vid: "utIPsneUnuY" },
-                    { name: "滑輪下拉 (或輔助引體向上)", vid: "AOpi-p0cJkc" },
-                    { name: "機械划船", vid: "GZbfZ033f74" },
-                    { name: "繩索三頭下壓", vid: "2-LAMcpzODU" },
-                    { name: "蝴蝶擴胸訓練機 (Pec Deck Fly)", vid: "fEOl1ZzWzNs" }
+                    { name: "引體向上", vid: "eGo4VzhlCZE" },
+                    { name: "單臂啞鈴划船", vid: "pYcpY20QaZI" },
+                    { name: "啞鈴二頭彎舉", vid: "ykJmrZ5v0Oo" }
                 ]
             },
-            { 
-                day: "週日 (健身房)", 
-                type: "重訓", 
-                focus: "下肢大重量 (關節保護版)",
+            {
+                day: "週三",
+                type: "重訓",
+                focus: "下肢 (居家)",
                 exercises: [
-                    { name: "槓鈴深蹲 (或高腳杯深蹲/椅子輔助)", vid: "dO-51htz_eA" },
-                    { name: "腿舉機 (Leg Press)", vid: "vZ9rufloaoo" },
-                    { name: "六角槓硬舉 (Trap Bar) 或箱上硬舉", vid: "hQgFixeXdZo" },
-                    { name: "坐姿腿彎舉", vid: "F488k67BTNo" },
-                    { name: "髖內收機 (Hip Adductor)", vid: "4pfeckTaLOg" }
+                    { name: "啞鈴深蹲", vid: "M-O-H3B5ZQA" },
+                    { name: "保加利亞分腿蹲", vid: "2C-uNgKwPLE" },
+                    { name: "啞鈴羅馬尼亞硬舉", vid: "JCXUYuzwEqk" }
                 ]
             },
-            { 
-                day: "週一", 
-                type: "休", 
-                focus: "完全休息", 
-                routine: "補充魚油＋善存，確保深層睡眠，恢復神經系統。" 
+            {
+                day: "週四",
+                type: "休息",
+                focus: "積極恢復",
+                routine: "輕鬆散步 20-30 分鐘或瑜伽伸展。"
             },
-            { 
-                day: "週二/三 (居家啞鈴)", 
-                type: "重訓", 
-                // 🔄 修改 1：週二/三改為上肢維持
-                focus: "上肢維持",
+            {
+                day: "週五",
+                type: "重訓",
+                focus: "上肢推 (居家)",
                 exercises: [
-                    { name: "輔助引體向上 或 啞鈴划船", vid: "ZHllQTJf7eA" },
-                    { name: "啞鈴地板臥推", vid: "uUGDRwge4F8" },
-                    { name: "啞鈴肩推 (坐姿)", vid: "qEwKCR5JCog" }
+                    { name: "啞鈴臥推", vid: "VmB1G1K7v94" },
+                    { name: "坐姿啞鈴肩推", vid: "qEwKCR5JCog" },
+                    { name: "伏地挺身", vid: "IODxDxX7oi4" }
                 ]
             },
-            { 
-                day: "週四/五 (居家啞鈴)", 
-                type: "重訓", 
-                // 🔄 修改 1：週四/五改為下肢維持
-                focus: "下肢維持 (安全版)",
+            {
+                day: "週六",
+                type: "重訓",
+                focus: "重裝下肢 (健身房)",
                 exercises: [
-                    { name: "保加利亞單腿蹲 (椅子輔助)", vid: "vLuhN_glFZ8" },
-                    { name: "啞鈴高腳杯深蹲", vid: "MeIiIdhgPwg" },
-                    // 🔄 修改 2：修正啞鈴臀橋影片，改為標準啞鈴臀推教學
-                    { name: "啞鈴臀橋 (Glute Bridge)", vid: "h8Z0-31R08k" }
+                    { name: "架式舉重機", vid: "ZmtR7z_E1G0" },  // <-- 這裡新增了你的架式舉重機
+                    { name: "器械腿舉", vid: "yZmx_Ac3880" },
+                    { name: "坐姿腿屈伸", vid: "YyvSfVjQeL0" }
+                ]
+            },
+            {
+                day: "週日",
+                type: "重訓",
+                focus: "核心與複合 (居家)",
+                exercises: [
+                    { name: "啞鈴弓箭步", vid: "D7KaRcUTQeE" },
+                    { name: "棒式", vid: "pSHjTRCQxIw" },
+                    { name: "啞鈴側平舉", vid: "3VcKaXpzqRo" }
                 ]
             }
         ]
