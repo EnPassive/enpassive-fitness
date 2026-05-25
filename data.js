@@ -60,7 +60,7 @@ day: "週日 (健身房)",
 type: "重訓", 
 focus: "下肢大重量 (關節保護版)",
 exercises: [
-{ name: "架式舉重機", vid: "ZmtR7z_E1G0" },
+{ name: "架式舉重機", vid: "mqNPTVUL4Lk" },
 { name: "槓鈴深蹲 (或高腳杯深蹲/椅子輔助)", vid: "dO-51htz_eA" },
 { name: "腿舉機 (Leg Press)", vid: "vZ9rufloaoo" },
 { name: "六角槓硬舉 (Trap Bar) 或箱上硬舉", vid: "hQgFixeXdZo" },
