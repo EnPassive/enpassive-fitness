@@ -1,392 +1,398 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EnPassive｜高階體態增肌系統 v5.3</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EnPassive｜高階體態增肌系統 v5.3</title>
 
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2563eb">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="EnPassive">
-    <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <style>
-        :root { 
-            --primary: #2563eb; --secondary: #10b981; --bg: #f8fafc; 
-            --card: #ffffff; --text: #1e293b; --muted: #64748b; 
-            --border: #e2e8f0; --accent: #f59e0b; --warning: #b45309;
-        }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; line-height: 1.5; -webkit-tap-highlight-color: transparent; }
-        .container { max-width: 1000px; margin: 0 auto; background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: var(--primary); font-size: 22px; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: var(--muted); font-size: 13.5px; margin-bottom: 20px; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .form-group { display: flex; flex-direction: column; }
-        label { font-weight: 600; margin-bottom: 4px; font-size: 12.5px; }
-        input, select { padding: 9px; border: 1px solid var(--border); border-radius: 6px; font-size: 14.5px; }
-        
-        button.main-btn { background: var(--primary); color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 15px; }
-        button.clear-btn { background: #ef4444; color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13.5px; }
-        
-        #result-section { display: none; }
-        .card { background: #f8fafc; padding: 16px; border-radius: 10px; margin-bottom: 18px; border-left: 4px solid var(--primary); }
-        .card h3 { margin-top: 0; color: var(--primary); border-bottom: 1px dashed #cbd5e1; padding-bottom: 10px; font-size: 18px; }
-        
-        .workout-day-box { margin-bottom: 28px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .day-header { background: #e2e8f0; padding: 13px; font-weight: bold; display: flex; justify-content: space-between; font-size: 15.5px; align-items: center; flex-wrap: wrap; gap: 8px; }
-        .daily-volume-tag { font-size: 12px; color: #ea580c; background: #ffedd5; padding: 3px 8px; border-radius: 6px; border: 1px solid #fdba74; }
-        
-        .exercise-item { padding: 17px; border-bottom: 1px solid var(--border); }
-        .exercise-item:last-child { border-bottom: none; }
-        .ex-name { font-weight: 800; color: var(--text); font-size: 16px; margin-bottom: 9px; }
-        .ex-name a { color: #ea580c; text-decoration: none; margin-left: 8px; font-size: 13px; }
-        
-        .tracking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 5px; }
-        .track-box { background: #f1f5f9; padding: 11px; border-radius: 8px; font-size: 13.5px; }
-        .benchmark-val { color: #166534; font-weight: bold; }
-        
-        .record-input-group { grid-column: span 2; display: flex; gap: 8px; margin-top: 9px; align-items: center; }
-        .record-input { flex: 1; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14.5px; box-sizing: border-box; text-align: center; }
-        .input-divider { font-weight: bold; color: var(--muted); }
-        .save-btn { background: var(--secondary); color: white; border: none; padding: 9px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13.5px; min-width: 70px; }
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EnPassive">
 
-        .volume-chart-container { position: relative; height: 180px; margin-top: 15px; background: #f8fafc; border-radius: 8px; padding: 8px; }
-        
-        .macro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; text-align: center; margin-bottom: 15px; }
-        .macro-box { background: white; padding: 15px 5px; border-radius: 10px; border: 1px solid var(--border); }
-        .macro-val { font-size: 18.5px; font-weight: 800; }
-        .macro-lbl { font-size: 10.5px; color: var(--muted); }
-        .meal-option { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #e2e8f0; }
-        .meal-option:last-child { border-bottom: none; }
-        .timing-box { font-size: 14px; color: #334155; background: white; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
-        
-        .chart-container { position: relative; height: 320px; margin-top: 15px; }
-        @media (max-width: 600px) {
-            .tracking-grid { grid-template-columns: 1fr; }
-            .record-input-group { flex-wrap: wrap; }
-            .record-input { min-width: 30%; }
-            .save-btn { width: 100%; margin-top: 5px; }
-        }
-    </style>
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root { 
+--primary: #2563eb; --secondary: #10b981; --bg: #f8fafc; 
+--card: #ffffff; --text: #1e293b; --muted: #64748b; 
+--border: #e2e8f0; --accent: #f59e0b; --warning: #b45309;
+}
+body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; line-height: 1.5; -webkit-tap-highlight-color: transparent; }
+.container { max-width: 1000px; margin: 0 auto; background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+h1 { text-align: center; color: var(--primary); font-size: 22px; margin-bottom: 5px; }
+.subtitle { text-align: center; color: var(--muted); font-size: 13.5px; margin-bottom: 20px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.form-group { display: flex; flex-direction: column; }
+label { font-weight: 600; margin-bottom: 4px; font-size: 12.5px; }
+input, select { padding: 9px; border: 1px solid var(--border); border-radius: 6px; font-size: 14.5px; }
+
+button.main-btn { background: var(--primary); color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 15px; }
+button.clear-btn { background: #ef4444; color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13.5px; }
+
+#result-section { display: none; }
+.card { background: #f8fafc; padding: 16px; border-radius: 10px; margin-bottom: 18px; border-left: 4px solid var(--primary); }
+.card h3 { margin-top: 0; color: var(--primary); border-bottom: 1px dashed #cbd5e1; padding-bottom: 10px; font-size: 18px; }
+
+.workout-day-box { margin-bottom: 28px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.day-header { background: #e2e8f0; padding: 13px; font-weight: bold; display: flex; justify-content: space-between; font-size: 15.5px; align-items: center; flex-wrap: wrap; gap: 8px; }
+.daily-volume-tag { font-size: 12px; color: #ea580c; background: #ffedd5; padding: 3px 8px; border-radius: 6px; border: 1px solid #fdba74; }
+
+.exercise-item { padding: 17px; border-bottom: 1px solid var(--border); }
+.exercise-item:last-child { border-bottom: none; }
+.ex-name { font-weight: 800; color: var(--text); font-size: 16px; margin-bottom: 9px; }
+.ex-name a { color: #ea580c; text-decoration: none; margin-left: 8px; font-size: 13px; }
+
+.tracking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 5px; }
+.track-box { background: #f1f5f9; padding: 11px; border-radius: 8px; font-size: 13.5px; }
+.benchmark-val { color: #166534; font-weight: bold; }
+
+.record-input-group { grid-column: span 2; display: flex; gap: 8px; margin-top: 9px; align-items: center; }
+.record-input { flex: 1; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14.5px; box-sizing: border-box; text-align: center; }
+.input-divider { font-weight: bold; color: var(--muted); }
+.save-btn { background: var(--secondary); color: white; border: none; padding: 9px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13.5px; min-width: 70px; }
+
+.volume-chart-container { position: relative; height: 180px; margin-top: 15px; background: #f8fafc; border-radius: 8px; padding: 8px; }
+
+.macro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; text-align: center; margin-bottom: 15px; }
+.macro-box { background: white; padding: 15px 5px; border-radius: 10px; border: 1px solid var(--border); }
+.macro-val { font-size: 18.5px; font-weight: 800; }
+.macro-lbl { font-size: 10.5px; color: var(--muted); }
+.meal-option { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #e2e8f0; }
+.meal-option:last-child { border-bottom: none; }
+.timing-box { font-size: 14px; color: #334155; background: white; padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
+
+.chart-container { position: relative; height: 320px; margin-top: 15px; }
+@media (max-width: 600px) {
+.tracking-grid { grid-template-columns: 1fr; }
+.record-input-group { flex-wrap: wrap; }
+.record-input { min-width: 30%; }
+.save-btn { width: 100%; margin-top: 5px; }
+}
+</style>
 </head>
 <body>
 
 <div class="container">
-    <h1>EnPassive｜高階體態增肌系統 v5.3</h1>
-    <p class="subtitle">PWA 手機 App 版・精準容量計算</p>
-    
-    <div class="grid">
-        <div class="form-group"><label>年齡</label><input type="number" id="age" value="52" onchange="debouncedGenerate()"></div>
-        <div class="form-group"><label>身高 (cm)</label><input type="number" id="height" value="165" onchange="debouncedGenerate()"></div>
-        <div class="form-group"><label>體重 (kg)</label><input type="number" id="weight" value="57" step="0.1" onchange="debouncedGenerate()"></div>
-        <div class="form-group">
-            <label>訓練模式</label>
-            <select id="workoutMode"><option value="mode_a">週末重裝＋平日居家</option></select>
-        </div>
-        <div class="form-group">
-            <label>主要目標</label>
-            <select id="goal"><option value="muscle">乾淨增肌</option><option value="fatloss">高效減脂</option></select>
-        </div>
-    </div>
-    <button class="main-btn" onclick="generatePlan()">🚀 啟動 / 更新個人化參數</button>
-    
-    <div id="result-section">
-        <div class="card" style="border-left-color: var(--accent);">
-            <h3>📈 體態發展趨勢</h3>
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-                <input type="date" id="stat-date" style="flex:1;">
-                <input type="number" id="stat-weight" placeholder="體重" step="0.1" style="flex:1;">
-                <input type="number" id="stat-waist" placeholder="腰圍" step="0.1" style="flex:1;">
-                <button onclick="addStat()" style="padding:0 15px; width:auto;" class="save-btn">新增紀錄</button>
-            </div>
-            <div class="chart-container"><canvas id="growthChart"></canvas></div>
-        </div>
+<h1>EnPassive｜高階體態增肌系統 v5.3</h1>
+<p class="subtitle">PWA 手機 App 版・精準容量計算</p>
 
-        <div class="card">
-            <h3>🏋️‍♂️ 科學訓練課表</h3>
-            <div id="workout-container"></div>
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="clear-btn" onclick="clearAllRecords()">⚠️ 清除所有歷史紀錄</button>
-            </div>
-        </div>
+<div class="grid">
+<div class="form-group"><label>年齡</label><input type="number" id="age" value="52" onchange="debouncedGenerate()"></div>
+<div class="form-group"><label>身高 (cm)</label><input type="number" id="height" value="165" onchange="debouncedGenerate()"></div>
+<div class="form-group"><label>體重 (kg)</label><input type="number" id="weight" value="57" step="0.1" onchange="debouncedGenerate()"></div>
+<div class="form-group">
+<label>訓練模式</label>
+<select id="workoutMode"><option value="mode_a">週末重裝＋平日居家</option></select>
+</div>
+<div class="form-group">
+<label>主要目標</label>
+<select id="goal"><option value="muscle">乾淨增肌</option><option value="fatloss">高效減脂</option></select>
+</div>
+</div>
+<button class="main-btn" onclick="generatePlan()">🚀 啟動 / 更新個人化參數</button>
 
-        <div class="card">
-            <h3>🍽️ 巨量營養素與飲食建議</h3>
-            <div class="macro-grid">
-                <div class="macro-box"><div class="macro-val" id="t-cal" style="color:#2563eb;">0</div><div class="macro-lbl">熱量(kcal)</div></div>
-                <div class="macro-box"><div class="macro-val" id="t-pro" style="color:#ea580c;">0</div><div class="macro-lbl">蛋白(g)</div></div>
-                <div class="macro-box"><div class="macro-val" id="t-fat" style="color:#047857;">0</div><div class="macro-lbl">脂肪(g)</div></div>
-                <div class="macro-box"><div class="macro-val" id="t-car" style="color:#7e22ce;">0</div><div class="macro-lbl">碳水(g)</div></div>
-            </div>
-            <div id="meal-timing" class="timing-box"></div>
-        </div>
-    </div>
+<div id="result-section">
+<div class="card" style="border-left-color: var(--accent);">
+<h3>📈 體態發展趨勢</h3>
+<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+<input type="date" id="stat-date" style="flex:1;">
+<input type="number" id="stat-weight" placeholder="體重" step="0.1" style="flex:1;">
+<input type="number" id="stat-waist" placeholder="腰圍" step="0.1" style="flex:1;">
+<button onclick="addStat()" style="padding:0 15px; width:auto;" class="save-btn">新增紀錄</button>
+</div>
+<div class="chart-container"><canvas id="growthChart"></canvas></div>
+</div>
+
+<div class="card">
+<h3>🏋️‍♂️ 科學訓練課表</h3>
+<div id="workout-container"></div>
+<div style="text-align: center; margin-top: 20px;">
+<button class="clear-btn" onclick="clearAllRecords()">⚠️ 清除所有歷史紀錄</button>
+</div>
+</div>
+
+<div class="card">
+<h3>🍽️ 巨量營養素與飲食建議</h3>
+<div class="macro-grid">
+<div class="macro-box"><div class="macro-val" id="t-cal" style="color:#2563eb;">0</div><div class="macro-lbl">熱量(kcal)</div></div>
+<div class="macro-box"><div class="macro-val" id="t-pro" style="color:#ea580c;">0</div><div class="macro-lbl">蛋白(g)</div></div>
+<div class="macro-box"><div class="macro-val" id="t-fat" style="color:#047857;">0</div><div class="macro-lbl">脂肪(g)</div></div>
+<div class="macro-box"><div class="macro-val" id="t-car" style="color:#7e22ce;">0</div><div class="macro-lbl">碳水(g)</div></div>
+</div>
+<div id="meal-timing" class="timing-box"></div>
+</div>
+</div>
 </div>
 
 <script src="data.js"></script>
 <script>
-    let myChart = null;
-    let debounceTimer = null;
+let myChart = null;
+let debounceTimer = null;
 
-    function debouncedGenerate() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => generatePlan(true), 300);
-    }
+function debouncedGenerate() {
+clearTimeout(debounceTimer);
+debounceTimer = setTimeout(() => generatePlan(true), 300);
+}
 
-    function getStrengthStandard(name, weight, age) {
-        const ageFactor = age > 50 ? 0.75 : 0.88;
-        // 已新增 "架式": 0.7 係數
-        const ratios = { "深蹲": 0.75, "腿舉": 1.8, "硬舉": 0.9, "臥推": 0.55, "划船": 0.55, "肩推": 0.35, "架式": 0.7 };
-        let r = 0;
-        for (let k in ratios) if (name.includes(k)) r = ratios[k];
-        let base = r === 0 ? 20 : Math.round((weight * r * ageFactor) / 2.5) * 2.5;
-        return base + "kg";
-    }
+function getStrengthStandard(name, weight, age) {
+const ageFactor = age > 50 ? 0.75 : 0.88;
+const ratios = { "深蹲": 0.75, "腿舉": 1.8, "硬舉": 0.9, "臥推": 0.55, "划船": 0.55, "肩推": 0.35, "架式": 0.7 };
+let r = 0;
+for (let k in ratios) if (name.includes(k)) r = ratios[k];
+let base = r === 0 ? 20 : Math.round((weight * r * ageFactor) / 2.5) * 2.5;
+return base + "kg";
+}
 
-    function generateCleanKey(exName) {
-        return 'en_log_prod_' + exName.replace(/[\s\(\)\/]/g, '_');
-    }
+function generateCleanKey(exName) {
+return 'en_log_prod_' + exName.replace(/[\s\(\)\/]/g, '_');
+}
 
-    function getExerciseHistory(exName) {
-        const key = generateCleanKey(exName);
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : [];
-    }
+function getExerciseHistory(exName) {
+const key = generateCleanKey(exName);
+const data = localStorage.getItem(key);
+return data ? JSON.parse(data) : [];
+}
 
-    function saveExRecord(exName) {
-        const key = generateCleanKey(exName);
-        const wVal = parseFloat(document.getElementById('weight_' + key).value);
-        const rVal = parseInt(document.getElementById('reps_' + key).value);
-        
-        if (!wVal || !rVal) return alert("請完整輸入重量與次數！");
-        
-        let history = getExerciseHistory(exName);
-        const today = new Date().toISOString().split('T')[0];
-        
-        history.unshift({ 
-            date: today, 
-            weight: wVal, 
-            reps: rVal, 
-            volume: Math.round(wVal * rVal) 
-        });
-        
-        if (history.length > 20) history.pop();
-        
-        localStorage.setItem(key, JSON.stringify(history));
-        alert("✅ 紀錄已成功儲存！");
-        generatePlan(true);
-    }
+function saveExRecord(exName) {
+const key = generateCleanKey(exName);
+const wVal = parseFloat(document.getElementById('weight_' + key).value);
+const rVal = parseInt(document.getElementById('reps_' + key).value);
 
-    function calculateProgression(lastVal) {
-        if (!lastVal) return ""; 
-        const match = lastVal.match(/(\d+\.?\d*)\s*[kK]?[gG]?\s*[\*xX\s]\s*(\d+)/);
-        if (match) {
-            const w = parseFloat(match[1]);
-            const r = parseInt(match[2]);
-            const volume = Math.round(w * r);
-            let tip = r >= 9 
-                ? `💡 達標！下次挑戰 <b>${w + 1.25}~2.5kg</b>` 
-                : `💡 維持 <b>${w}kg</b>，下次目標突破 8-9 下`;
-            return `容量(Vol): <b>${volume}</b> <span style="margin: 0 5px; color:#cbd5e1;">|</span> ${tip}`;
-        }
-        return "";
-    }
+if (!wVal || !rVal) return alert("請完整輸入重量與次數！");
 
-    function clearAllRecords() {
-        if (confirm("確定清除所有訓練紀錄嗎？此動作無法復原。")) {
-            localStorage.clear();
-            alert("所有紀錄已重置。");
-            generatePlan(true);
-        }
-    }
+let history = getExerciseHistory(exName);
+const tzOffset = (new Date()).getTimezoneOffset() * 60000;
+const today = (new Date(Date.now() - tzOffset)).toISOString().split('T')[0];
 
-    function addStat() {
-        const date = document.getElementById('stat-date').value;
-        const weight = parseFloat(document.getElementById('stat-weight').value);
-        const waist = parseFloat(document.getElementById('stat-waist').value) || 0;
-        if (!date || !weight) return alert("請輸入日期與體重");
-        let stats = JSON.parse(localStorage.getItem('EnPassiveStats') || '[]');
-        stats.push({ date, weight, waist });
-        stats.sort((a,b) => new Date(a.date) - new Date(b.date));
-        localStorage.setItem('EnPassiveStats', JSON.stringify(stats));
-        updateChart();
-    }
+history.unshift({ 
+date: today, 
+weight: wVal, 
+reps: rVal, 
+volume: Math.round(wVal * rVal) 
+});
 
-    function updateChart() {
-        const stats = JSON.parse(localStorage.getItem('EnPassiveStats') || '[]');
-        if (stats.length === 0) return;
-        if (myChart) myChart.destroy();
-        const ctx = document.getElementById('growthChart').getContext('2d');
-        myChart = new Chart(ctx, {
-            type: 'line',
-            data: { labels: stats.map(s => s.date),
-                datasets: [
-                    { label: '體重(kg)', data: stats.map(s => s.weight), borderColor: '#2563eb', tension: 0.2, yAxisID: 'y' },
-                    { label: '腰圍(cm)', data: stats.map(s => s.waist), borderColor: '#ea580c', tension: 0.2, yAxisID: 'y1' }
-                ]
-            },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }
-        });
-    }
+if (history.length > 20) history.pop();
 
-    function renderVolumeChart(exName, container) {
-        const history = getExerciseHistory(exName);
-        if (history.length < 2) {
-            container.innerHTML = `<div style="color:#64748b; font-size:13px; text-align:center; padding:20px;">還沒有足夠紀錄，儲存後會顯示容量進步曲線</div>`;
-            return;
-        }
-        
-        const chartDiv = document.createElement('div');
-        chartDiv.className = 'volume-chart-container';
-        chartDiv.innerHTML = `<canvas id="volChart_${generateCleanKey(exName)}"></canvas>`;
-        container.appendChild(chartDiv);
+localStorage.setItem(key, JSON.stringify(history));
+alert("✅ 紀錄已成功儲存！");
+generatePlan(true);
+}
 
-        setTimeout(() => {
-            const ctx = document.getElementById(`volChart_${generateCleanKey(exName)}`);
-            if (!ctx) return;
-            new Chart(ctx.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: history.map(h => h.date),
-                    datasets: [{
-                        label: '容量 (kg×次)',
-                        data: history.map(h => h.volume),
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.3,
-                        borderWidth: 3,
-                        pointRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, title: { display: true, text: '容量' } } }
-                }
-            });
-        }, 50);
-    }
+function calculateProgression(lastVal) {
+if (!lastVal) return ""; 
+const match = lastVal.match(/(\d+\.?\d*)\s*[kK]?[gG]?\s*[\*xX\s]\s*(\d+)/);
+if (match) {
+const w = parseFloat(match[1]);
+const r = parseInt(match[2]);
+const volume = Math.round(w * r);
+let tip = r >= 9 
+? `💡 達標！下次挑戰 <b>${w + 1.25}~2.5kg</b>` 
+: `💡 維持 <b>${w}kg</b>，下次目標突破 8-9 下`;
+return `容量(Vol): <b>${volume}</b> <span style="margin: 0 5px; color:#cbd5e1;">|</span> ${tip}`;
+}
+return "";
+}
 
-    function renderSection(title, data) {
-        if (!data || !Array.isArray(data)) return "";
-        let html = `<strong>📍 ${title} (擇一)：</strong><div style="margin-top:8px;">`;
-        data.forEach(item => { 
-            html += `<div class="meal-option"><strong>✔️ ${item.name}</strong><br><span style="color:var(--muted); font-size:12.5px;">${item.desc}</span></div>`; 
-        });
-        return html + `</div>`;
-    }
+function clearAllRecords() {
+if (confirm("確定清除所有訓練紀錄嗎？此動作無法復原。")) {
+localStorage.clear();
+alert("所有紀錄已重置。");
+generatePlan(true);
+}
+}
 
-    function generatePlan(isUpdate = false) {
-        const weight = parseFloat(document.getElementById('weight').value) || 57;
-        const height = parseFloat(document.getElementById('height').value) || 165;
-        const age = parseFloat(document.getElementById('age').value) || 52;
-        const goal = document.getElementById('goal').value;
-        
-        const bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5; 
-        const targetCal = goal === 'muscle' ? (bmr * 1.55) + 350 : (bmr * 1.55) - 400;
-        const pro = Math.round(weight * 2.0);
-        const fat = Math.round((targetCal * 0.28) / 9);
-        const car = Math.round((targetCal - (pro * 4) - (fat * 9)) / 4);
+function addStat() { 
+const date = document.getElementById('stat-date').value;
+const weight = parseFloat(document.getElementById('stat-weight').value);
+const waist = parseFloat(document.getElementById('stat-waist').value) || 0;
+if (!date || !weight) return alert("請輸入日期與體重");
+let stats = JSON.parse(localStorage.getItem('EnPassiveStats') || '[]');
+stats.push({ date, weight, waist });
+stats.sort((a,b) => new Date(a.date) - new Date(b.date));
+localStorage.setItem('EnPassiveStats', JSON.stringify(stats));
+updateChart();
+}
 
-        document.getElementById('t-cal').innerText = Math.round(targetCal);
-        document.getElementById('t-pro').innerText = pro + 'g';
-        document.getElementById('t-fat').innerText = fat + 'g';
-        document.getElementById('t-car').innerText = car + 'g';
+function updateChart() { 
+const stats = JSON.parse(localStorage.getItem('EnPassiveStats') || '[]');
+if (stats.length === 0) return;
+if (myChart) myChart.destroy();
+const ctx = document.getElementById('growthChart').getContext('2d');
+myChart = new Chart(ctx, {
+type: 'line',
+data: { labels: stats.map(s => s.date),
+datasets: [
+{ label: '體重(kg)', data: stats.map(s => s.weight), borderColor: '#2563eb', tension: 0.2, yAxisID: 'y' },
+{ label: '腰圍(cm)', data: stats.map(s => s.waist), borderColor: '#ea580c', tension: 0.2, yAxisID: 'y1' }
+]
+},
+options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }
+});
+}
 
-        const wkData = workoutData["mode_a"];
-        const container = document.getElementById('workout-container');
-        container.innerHTML = "";
+function renderVolumeChart(exName, container) {
+const history = getExerciseHistory(exName);
+if (history.length < 2) {
+container.innerHTML = `<div style="color:#64748b; font-size:13px; text-align:center; padding:20px;">還沒有足夠紀錄，儲存後會顯示容量進步曲線</div>`;
+return;
+}
 
-        wkData.schedule.forEach((day) => {
-            let dailyVolume = 0;
-            if (day.type === "重訓" && day.exercises) {
-                day.exercises.forEach((ex) => {
-                    const history = getExerciseHistory(ex.name);
-                    if (history.length > 0) {
-                        dailyVolume += history[0].volume;
-                    }
-                });
-            }
+const chartDiv = document.createElement('div');
+chartDiv.className = 'volume-chart-container';
+chartDiv.innerHTML = `<canvas id="volChart_${generateCleanKey(exName)}"></canvas>`;
+container.appendChild(chartDiv);
 
-            const volumeTag = dailyVolume > 0 ? `<span class="daily-volume-tag">🔥 總容量: ${dailyVolume}</span>` : '';
-            let dayHtml = `<div class="workout-day-box">
-                <div class="day-header">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span>${day.day}</span>
-                        ${volumeTag}
-                    </div>
-                    <span>${day.focus}</span>
-                </div>`;
+setTimeout(() => {
+const ctx = document.getElementById(`volChart_${generateCleanKey(exName)}`);
+if (!ctx) return;
             
-            if (day.type === "重訓" && day.exercises) {
-                day.exercises.forEach((ex) => {
-                    const key = generateCleanKey(ex.name);
-                    const history = getExerciseHistory(ex.name);
-                    const lastVal = history.length > 0 ? `${history[0].weight}kg x ${history[0].reps}` : '尚未記錄';
-                    const bench = getStrengthStandard(ex.name, weight, age);
-                    const tip = calculateProgression(lastVal);
+const chartData = [...history].reverse();
+            
+new Chart(ctx.getContext('2d'), {
+type: 'line',
+data: {
+labels: chartData.map(h => h.date),
+datasets: [{
+label: '容量 (kg×次)',
+data: chartData.map(h => h.volume),
+borderColor: '#10b981',
+backgroundColor: 'rgba(16, 185, 129, 0.1)',
+tension: 0.3,
+borderWidth: 3,
+pointRadius: 4
+}]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false,
+plugins: { legend: { display: false } },
+scales: { y: { beginAtZero: true, title: { display: true, text: '容量' } } }
+}
+});
+}, 50);
+}
 
-                    dayHtml += `<div class="exercise-item">
-                        <div class="ex-name">${ex.name} <a href="https://www.youtube.com/watch?v=${ex.vid}" target="_blank">🎥 影片</a></div>
-                        <div class="tracking-grid">
-                            <div class="track-box">建議啟動：<span class="benchmark-val">${bench}</span></div>
-                            <div class="track-box">最近一次：${lastVal}</div>
-                            ${tip ? `<div class="track-box" style="grid-column: span 2; background: #fefce8; color: var(--warning);">${tip}</div>` : ''}
-                            <div class="record-input-group">
-                                <input type="number" id="weight_${key}" class="record-input" placeholder="重量(kg)" step="0.5">
-                                <span class="input-divider">x</span>
-                                <input type="number" id="reps_${key}" class="record-input" placeholder="次數">
-                                <button onclick="saveExRecord('${ex.name}')" class="save-btn">儲存</button>
-                            </div>
-                        </div>
-                        <div id="volume-chart-${key}"></div>
-                    </div>`;
-                });
-            } else {
-                dayHtml += `<div style="padding:17px; color:var(--muted); font-size:13.5px;">${day.routine || "休息日"}</div>`;
-            }
-            dayHtml += `</div>`;
-            container.innerHTML += dayHtml;
-        });
+function renderSection(title, data) {
+if (!data || !Array.isArray(data)) return "";
+let html = `<strong>📍 ${title} (擇一)：</strong><div style="margin-top:8px;">`;
+data.forEach(item => { 
+html += `<div class="meal-option"><strong>✔️ ${item.name}</strong><br><span style="color:var(--muted); font-size:12.5px;">${item.desc}</span></div>`; 
+});
+return html + `</div>`;
+}
 
-        setTimeout(() => {
-            wkData.schedule.forEach((day) => {
-                if (day.type === "重訓" && day.exercises) {
-                    day.exercises.forEach((ex) => {
-                        const chartContainer = document.getElementById(`volume-chart-${generateCleanKey(ex.name)}`);
-                        if (chartContainer) renderVolumeChart(ex.name, chartContainer);
-                    });
-                }
-            });
-        }, 100);
+function generatePlan(isUpdate = false) {
+const weight = parseFloat(document.getElementById('weight').value) || 57;
+const height = parseFloat(document.getElementById('height').value) || 165;
+const age = parseFloat(document.getElementById('age').value) || 52;
+const goal = document.getElementById('goal').value;
 
-        document.getElementById('meal-timing').innerHTML = 
-            renderSection("早餐", dietData.breakfast) + 
-            renderSection("午餐", dietData.lunch) + 
-            renderSection("晚餐", dietData.dinner) + 
-            renderSection("點心 / 訓練後", dietData.snack);
+const bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5; 
+const targetCal = goal === 'muscle' ? (bmr * 1.55) + 350 : (bmr * 1.55) - 400;
+const pro = Math.round(weight * 2.0);
+const fat = Math.round((targetCal * 0.28) / 9);
+const car = Math.round((targetCal - (pro * 4) - (fat * 9)) / 4);
 
-        document.getElementById('result-section').style.display = 'block';
-        if (!isUpdate) updateChart();
-    }
+document.getElementById('t-cal').innerText = Math.round(targetCal);
+document.getElementById('t-pro').innerText = pro + 'g';
+document.getElementById('t-fat').innerText = fat + 'g';
+document.getElementById('t-car').innerText = car + 'g';
 
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').then((reg) => {
-                console.log('ServiceWorker 註冊成功', reg.scope);
-            }).catch((err) => {
-                console.log('ServiceWorker 註冊失敗', err);
-            });
-        });
-    }
+const wkData = workoutData["mode_a"];
+const container = document.getElementById('workout-container');
+container.innerHTML = "";
 
-    window.onload = () => generatePlan();
+wkData.schedule.forEach((day) => {
+let dailyVolume = 0;
+if (day.type === "重訓" && day.exercises) {
+day.exercises.forEach((ex) => {
+const history = getExerciseHistory(ex.name);
+if (history.length > 0) {
+dailyVolume += history[0].volume;
+}
+});
+}
+
+const volumeTag = dailyVolume > 0 ? `<span class="daily-volume-tag">🔥 總容量: ${dailyVolume}</span>` : '';
+let dayHtml = `<div class="workout-day-box">
+               <div class="day-header">
+                   <div style="display:flex; align-items:center; gap:10px;">
+                       <span>${day.day}</span>
+                       ${volumeTag}
+                   </div>
+                   <span>${day.focus}</span>
+               </div>`;
+
+if (day.type === "重訓" && day.exercises) {
+day.exercises.forEach((ex) => {
+const key = generateCleanKey(ex.name);
+const history = getExerciseHistory(ex.name);
+const lastVal = history.length > 0 ? `${history[0].weight}kg x ${history[0].reps}` : '尚未記錄';
+const bench = getStrengthStandard(ex.name, weight, age);
+const tip = calculateProgression(lastVal);
+
+dayHtml += `<div class="exercise-item">
+                       <div class="ex-name">${ex.name} <a href="https://www.youtube.com/watch?v=${ex.vid}" target="_blank">🎥 影片</a></div>
+                       <div class="tracking-grid">
+                           <div class="track-box">建議啟動：<span class="benchmark-val">${bench}</span></div>
+                           <div class="track-box">最近一次：${lastVal}</div>
+                           ${tip ? `<div class="track-box" style="grid-column: span 2; background: #fefce8; color: var(--warning);">${tip}</div>` : ''}
+                           <div class="record-input-group">
+                               <input type="number" id="weight_${key}" class="record-input" placeholder="重量(kg)" step="0.5">
+                               <span class="input-divider">x</span>
+                               <input type="number" id="reps_${key}" class="record-input" placeholder="次數">
+                               <button onclick="saveExRecord('${ex.name}')" class="save-btn">儲存</button>
+                           </div>
+                       </div>
+                       <div id="volume-chart-${key}"></div>
+                   </div>`;
+});
+} else {
+dayHtml += `<div style="padding:17px; color:var(--muted); font-size:13.5px;">${day.routine || "休息日"}</div>`;
+}
+dayHtml += `</div>`;
+container.innerHTML += dayHtml;
+});
+
+setTimeout(() => {
+wkData.schedule.forEach((day) => {
+if (day.type === "重訓" && day.exercises) {
+day.exercises.forEach((ex) => {
+const chartContainer = document.getElementById(`volume-chart-${generateCleanKey(ex.name)}`);
+if (chartContainer) renderVolumeChart(ex.name, chartContainer);
+});
+}
+});
+}, 100);
+
+document.getElementById('meal-timing').innerHTML = 
+renderSection("早餐", dietData.breakfast) + 
+renderSection("午餐", dietData.lunch) + 
+renderSection("晚餐", dietData.dinner) + 
+renderSection("點心 / 訓練後", dietData.snack);
+
+document.getElementById('result-section').style.display = 'block';
+if (!isUpdate) updateChart();
+}
+
+if ('serviceWorker' in navigator) {
+window.addEventListener('load', () => {
+navigator.serviceWorker.register('./sw.js').then((reg) => {
+console.log('ServiceWorker 註冊成功', reg.scope);
+}).catch((err) => {
+console.log('ServiceWorker 註冊失敗', err);
+});
+});
+}
+
+window.onload = () => generatePlan();
 </script>
 </body>
 </html>
